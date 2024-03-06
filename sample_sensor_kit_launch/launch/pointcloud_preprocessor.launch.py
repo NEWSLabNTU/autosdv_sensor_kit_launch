@@ -1,6 +1,5 @@
 # Copyright 2020 Tier IV, Inc. All rights reserved.
 #
-
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -21,9 +20,9 @@ from launch.actions import SetLaunchConfiguration
 from launch.conditions import IfCondition
 from launch.conditions import UnlessCondition
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import ComposableNodeContainer
 from launch_ros.actions import LoadComposableNodes
 from launch_ros.descriptions import ComposableNode
+
 
 def launch_setup(context, *args, **kwargs):
     # set concat filter as a component
@@ -43,36 +42,20 @@ def launch_setup(context, *args, **kwargs):
                 ],
                 "output_frame": LaunchConfiguration("base_frame"),
                 "input_twist_topic_type": "twist",
+                "publish_synchronized_pointcloud": True,
             }
         ],
         extra_arguments=[{"use_intra_process_comms": LaunchConfiguration("use_intra_process")}],
     )
 
-
-    # set container to run all required components in the same process
-    container = ComposableNodeContainer(
-        name=LaunchConfiguration("container_name"),
-        namespace="",
-        package="rclcpp_components",
-        executable=LaunchConfiguration("container_executable"),
-        condition=UnlessCondition(LaunchConfiguration("use_pointcloud_container")),
-        output="screen",
-    )
-
-    target_container = (
-        container
-        if UnlessCondition(LaunchConfiguration("use_pointcloud_container")).evaluate(context)
-        else LaunchConfiguration("container_name")
-    )
-
     # load concat or passthrough filter
     concat_loader = LoadComposableNodes(
         composable_node_descriptions=[concat_component],
-        target_container=target_container,
+        target_container=LaunchConfiguration("pointcloud_container_name"),
         condition=IfCondition(LaunchConfiguration("use_concat_filter")),
     )
 
-    return [container, concat_loader]
+    return [concat_loader]
 
 
 def generate_launch_description():
