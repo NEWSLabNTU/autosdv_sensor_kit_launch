@@ -37,8 +37,8 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
             {
                 "input_topics": [
-                    "/sensing/lidar/blickfeld_cube1_front/bf_lidar/points_raw",
-                    "/sensing/lidar/blickfeld_cube1_front/bf_lidar/points_raw",
+                    "/sensing/lidar/blickfeld_cube1_front/points_raw",
+                    "/sensing/lidar/blickfeld_cube1_front/points_raw",
                 ],
                 "output_frame": LaunchConfiguration("base_frame"),
                 "input_twist_topic_type": "twist",

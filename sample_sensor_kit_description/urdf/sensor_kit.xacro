@@ -21,7 +21,7 @@
     <xacro:property name="calibration" value="${xacro.load_yaml('$(arg config_dir)/sensor_kit_calibration.yaml')}"/>
 
     <!-- lidar -->
-    <xacro:Cube1 parent="sensor_kit_base_link" name="blickfeld_cube1_front/bf_lidar" topic="/points_raw" hz="10" samples="220">
+    <xacro:Cube1 parent="sensor_kit_base_link" name="blickfeld_cube1_front" topic="/points_raw" hz="10" samples="220">
       <origin
         xyz="${calibration['sensor_kit_base_link']['blickfeld_cube1_front_base_link']['x']}
              ${calibration['sensor_kit_base_link']['blickfeld_cube1_front_base_link']['y']}

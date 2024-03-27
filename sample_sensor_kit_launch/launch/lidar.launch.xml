@@ -10,7 +10,6 @@
   <group>
     <push-ros-namespace namespace="lidar"/>
     <group>
-      <push-ros-namespace namespace="blickfeld_cube1_front"/>
       <include file="$(find-pkg-share blickfeld_driver)/launch/live_scanner_component.launch.py">
         <arg name="frame_id" value="blickfeld_cube1_front"/>
         <arg name="device_ip" value="192.168.26.26"/>
