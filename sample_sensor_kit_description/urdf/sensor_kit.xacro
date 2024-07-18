@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="sensor_kit_macro" params="parent x y z roll pitch yaw">
-    <xacro:include filename="$(find blickfeld_driver)/config/blickfeld_cube1.xacro"/>cd
+    <xacro:include filename="$(find zed_wrapper)/urdf/zed_macro.urdf.xacro"/>
     <xacro:include filename="$(find imu_description)/urdf/imu.xacro"/>
     <xacro:arg name="gpu" default="false"/>
     <xacro:arg name="config_dir" default="$(find sample_sensor_kit_description)/config"/>
@@ -21,31 +21,50 @@
     <xacro:property name="calibration" value="${xacro.load_yaml('$(arg config_dir)/sensor_kit_calibration.yaml')}"/>
 
     <!-- lidar -->
-    <xacro:Cube1 parent="sensor_kit_base_link" name="blickfeld_cube1_front" topic="/points_raw" hz="10" samples="220">
-      <origin
-        xyz="${calibration['sensor_kit_base_link']['blickfeld_cube1_front_base_link']['x']}
-             ${calibration['sensor_kit_base_link']['blickfeld_cube1_front_base_link']['y']}
-             ${calibration['sensor_kit_base_link']['blickfeld_cube1_front_base_link']['z']}"
-        rpy="${calibration['sensor_kit_base_link']['blickfeld_cube1_front_base_link']['roll']}
-             ${calibration['sensor_kit_base_link']['blickfeld_cube1_front_base_link']['pitch']}
-             ${calibration['sensor_kit_base_link']['blickfeld_cube1_front_base_link']['yaw']}"
+    <joint name="lidar_joint" type="fixed">
+      <origin  
+        xyz="${calibration['sensor_kit_base_link']['lidar']['x']}
+             ${calibration['sensor_kit_base_link']['lidar']['y']}
+             ${calibration['sensor_kit_base_link']['lidar']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['lidar']['roll']}
+             ${calibration['sensor_kit_base_link']['lidar']['pitch']}
+             ${calibration['sensor_kit_base_link']['lidar']['yaw']}"
       />
-    </xacro:Cube1>
-
-    <!-- gnss -->
-    <xacro:imu_macro
-      name="gnss"
-      parent="sensor_kit_base_link"
-      namespace=""
-      x="${calibration['sensor_kit_base_link']['gnss_link']['x']}"
-      y="${calibration['sensor_kit_base_link']['gnss_link']['y']}"
-      z="${calibration['sensor_kit_base_link']['gnss_link']['z']}"
-      roll="${calibration['sensor_kit_base_link']['gnss_link']['roll']}"
-      pitch="${calibration['sensor_kit_base_link']['gnss_link']['pitch']}"
-      yaw="${calibration['sensor_kit_base_link']['gnss_link']['yaw']}"
-      fps="100"
-    />
-
+      <parent link="sensor_kit_base_link"/>
+      <child link="lidar"/>
+    </joint>
+    
+    <link name="lidar">
+      <inertial>
+        <mass value="0.1"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+      </inertial>
+    </link>
+    
+    <!-- camera -->
+    <joint name="zedxm_camera_joint" type="fixed">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['zedxm_camera_link']['x']}
+             ${calibration['sensor_kit_base_link']['zedxm_camera_link']['y']}
+             ${calibration['sensor_kit_base_link']['zedxm_camera_link']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['zedxm_camera_link']['roll']}
+             ${calibration['sensor_kit_base_link']['zedxm_camera_link']['pitch']}
+             ${calibration['sensor_kit_base_link']['zedxm_camera_link']['yaw']}"
+      />
+      <parent link="sensor_kit_base_link"/>
+      <child link="zedxm_camera_link"/>
+    </joint>
+    <xacro:zed_camera name="zedxm" model="zedxm" custom_baseline="0" enable_gnss="false">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['zedxm_camera_link']['x']}
+             ${calibration['sensor_kit_base_link']['zedxm_camera_link']['y']}
+             ${calibration['sensor_kit_base_link']['zedxm_camera_link']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['zedxm_camera_link']['roll']}
+             ${calibration['sensor_kit_base_link']['zedxm_camera_link']['pitch']}
+             ${calibration['sensor_kit_base_link']['zedxm_camera_link']['yaw']}"
+      />
+    </xacro:zed_camera>
 
   </xacro:macro>
 </robot>
