@@ -17,11 +17,11 @@
 
     <arg name="imu_raw_name" default="/sensing/imu/imu_raw"/>
     <arg name="imu_corrector_param_file" default="$(find-pkg-share individual_params)/config/$(var vehicle_id)/f1eighth_sensor_kit/imu_corrector.param.yaml"/>
-    <node pkg="xsens_mti_ros2_driver" exec="xsens_mti_node" name="xsens_mti_node" output="screen" if="$(var launch_driver)">
-      <remap from="/gnss" to="$(var navsatfix_topic_name)"/>
-      <remap from="/filter/velocity" to="velocity"/>
-      <remap from="/imu/data" to="$(var imu_raw_name)"/>
-    </node>
+    <!-- <node pkg="xsens_mti_ros2_driver" exec="xsens_mti_node" name="xsens_mti_node" output="screen" if="$(var launch_driver)"> -->
+    <!--   <remap from="/gnss" to="$(var navsatfix_topic_name)"/> -->
+    <!--   <remap from="/filter/velocity" to="velocity"/> -->
+    <!--   <remap from="/imu/data" to="$(var imu_raw_name)"/> -->
+    <!-- </node> -->
     <include file="$(find-pkg-share imu_corrector)/launch/imu_corrector.launch.xml">
       <arg name="input_topic" value="$(var imu_raw_name)"/>
       <arg name="output_topic" value="imu_data"/>
