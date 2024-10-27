@@ -6,26 +6,16 @@
   <group>
     <push-ros-namespace namespace="imu"/>
 
-    <!--group>
-      <push-ros-namespace namespace="tamagawa"/>
-      <node pkg="tamagawa_imu_driver" name="tag_serial_driver" exec="tag_serial_driver" if="$(var launch_driver)">
-        <remap from="imu/data_raw" to="imu_raw"/>
-        <param name="port" value="/dev/imu"/>
-        <param name="imu_frame_id" value="tamagawa/imu_link"/>
-      </node>
-    </group-->
-
     <arg name="imu_raw_name" default="/sensing/imu/imu_raw"/>
     <arg name="imu_corrector_param_file" default="$(find-pkg-share individual_params)/config/$(var vehicle_id)/f1eighth_sensor_kit/imu_corrector.param.yaml"/>
 
-    <include file="$(find-pkg-share mpu6050driver)/launch/mpu6050driver_launch.xml">
-    </include>
-
-    <!-- <node pkg="xsens_mti_ros2_driver" exec="xsens_mti_node" name="xsens_mti_node" output="screen" if="$(var launch_driver)"> -->
-    <!--   <remap from="/gnss" to="$(var navsatfix_topic_name)"/> -->
-    <!--   <remap from="/filter/velocity" to="velocity"/> -->
-    <!--   <remap from="/imu/data" to="$(var imu_raw_name)"/> -->
-    <!-- </node> -->
+    <group>
+      <push-ros-namespace namespace="mpu9250"/>
+      <node pkg="mpu9250driver" exec="mpu9250driver" name="mpu9250driver_node" output="screen" if="$(var launch_driver)">
+        <remap from="imu" to="$(var imu_raw_name)"/>
+        <param from="$(find-pkg-share mpu9250driver)/params/mpu9250.yaml"/>
+      </node>
+    </group>
 
     <include file="$(find-pkg-share imu_corrector)/launch/imu_corrector.launch.xml">
       <arg name="input_topic" value="$(var imu_raw_name)"/>
