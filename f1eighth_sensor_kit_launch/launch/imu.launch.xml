@@ -6,13 +6,13 @@
   <group>
     <push-ros-namespace namespace="imu"/>
 
-    <arg name="imu_raw_name" default="/sensing/imu/imu_raw"/>
+    <arg name="imu_raw_name" default="mpu9250/imu_raw"/>
     <arg name="imu_corrector_param_file" default="$(find-pkg-share individual_params)/config/$(var vehicle_id)/f1eighth_sensor_kit/imu_corrector.param.yaml"/>
 
     <group>
       <push-ros-namespace namespace="mpu9250"/>
       <node pkg="mpu9250driver" exec="mpu9250driver" name="mpu9250driver_node" output="screen" if="$(var launch_driver)">
-        <remap from="imu" to="$(var imu_raw_name)"/>
+        <remap from="imu" to="imu_raw"/>
         <param from="$(find-pkg-share mpu9250driver)/params/mpu9250.yaml"/>
       </node>
     </group>
