@@ -68,6 +68,7 @@ def generate_launch_description():
     add_launch_arg("use_multithread", "False")
     add_launch_arg("use_intra_process", "False")
     add_launch_arg("pointcloud_container_name", "pointcloud_container")
+    add_launch_arg("use_concat_filter", "True")
 
     set_container_executable = SetLaunchConfiguration(
         "container_executable",
