@@ -10,7 +10,7 @@
   <group>
     <push-ros-namespace namespace="lidar"/>
     <group>
-      <include file="$(find-pkg-share blickfeld_driver)/launch/live_scanner_component.launch.py">
+      <include file="$(find-pkg-share blickfeld_driver)/launch/live_scanner_component.launch.py" if="$(var launch_driver)">
       </include>
     </group>
 

@@ -6,7 +6,7 @@
   <group>
     <push-ros-namespace namespace="camera"/>
 
-    <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py">
+    <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py" if="$(var launch_driver)">
       <arg name="camera_name" value="$(var camera_model)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
     </include>
