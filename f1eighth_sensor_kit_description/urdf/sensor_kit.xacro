@@ -56,8 +56,16 @@
       <child link="imu_link"/>
     </joint>
 
+    <link name="imu_link">
+      <inertial>
+        <mass value="0.1"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+      </inertial>
+    </link>
+
     <!-- gnss -->
-    <!-- <joint name="gnss_joint" type="fixed">
+    <joint name="gnss_joint" type="fixed">
       <origin
         xyz="${calibration['sensor_kit_base_link']['gnss_base_link']['x']}
              ${calibration['sensor_kit_base_link']['gnss_base_link']['y']}
@@ -68,8 +76,14 @@
       />
       <parent link="sensor_kit_base_link"/>
       <child link="gnss_base_link"/>
-    </joint>  -->
-
+    </joint> 
+    <link name="gnss_base_link">
+      <inertial>
+        <mass value="0.1"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+      </inertial>
+    </link>
 
 
     <!-- camera -->

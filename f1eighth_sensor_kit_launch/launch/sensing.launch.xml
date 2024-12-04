@@ -23,9 +23,9 @@
     </include>
 
     <!-- GNSS Driver -->
-    <!-- <include file="$(find-pkg-share f1eighth_sensor_kit_launch)/launch/gnss.launch.xml">
+    <include file="$(find-pkg-share f1eighth_sensor_kit_launch)/launch/gnss.launch.xml">
       <arg name="launch_driver" value="$(var launch_driver)"/>
-    </include> -->
+    </include>
 
     <!-- Vehicle Velocity Converter  -->
     <include file="$(find-pkg-share vehicle_velocity_converter)/launch/vehicle_velocity_converter.launch.xml">
