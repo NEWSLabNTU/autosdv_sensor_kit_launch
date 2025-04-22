@@ -1,5 +1,6 @@
 <launch>
   <arg name="launch_driver" default="true"/>
+  <arg name="lidar_model" default="robin-w" description="cube1 or robin-w"/>
   <arg name="host_ip" default="192.168.26.1"/>
   <arg name="use_concat_filter" default="true"/>
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
@@ -10,8 +11,16 @@
   <group>
     <push-ros-namespace namespace="lidar"/>
     <group>
-      <include file="$(find-pkg-share blickfeld_driver)/launch/live_scanner_component.launch.py" if="$(var launch_driver)">
-      </include>
+
+      <group if="$(eval &quot;'$(var lidar_model)'=='cube1'&quot;)">
+	<include file="$(find-pkg-share blickfeld_driver)/launch/live_scanner_component.launch.py" if="$(var launch_driver)">
+	</include>
+      </group>
+
+      <group if="$(eval &quot;'$(var lidar_model)'=='robin-w'&quot;)">
+	<include file="$(find-pkg-share f1eighth_sensor_kit_launch)/launch/ivu_pc2.py" if="$(var launch_driver)">
+	</include>
+      </group>
     </group>
 
 
