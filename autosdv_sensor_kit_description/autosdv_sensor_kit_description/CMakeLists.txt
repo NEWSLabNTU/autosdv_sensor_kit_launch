@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(f1eighth_sensor_kit_description)
+project(autosdv_sensor_kit_description)
 
 find_package(ament_cmake_auto REQUIRED)
 

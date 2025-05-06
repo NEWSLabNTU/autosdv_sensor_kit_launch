@@ -18,13 +18,13 @@
       </group>
 
       <group if="$(eval &quot;'$(var lidar_model)'=='robin-w'&quot;)">
-	<include file="$(find-pkg-share f1eighth_sensor_kit_launch)/launch/ivu_pc2.py" if="$(var launch_driver)">
+	<include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/ivu_pc2.py" if="$(var launch_driver)">
 	</include>
       </group>
     </group>
 
 
-    <!-- <include file="$(find-pkg-share f1eighth_sensor_kit_launch)/launch/pointcloud_preprocessor.launch.py"> -->
+    <!-- <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/pointcloud_preprocessor.launch.py"> -->
     <!--   <arg name="base_frame" value="base_link"/> -->
     <!--   <arg name="use_intra_process" value="true"/> -->
     <!--   <arg name="use_multithread" value="true"/> -->
