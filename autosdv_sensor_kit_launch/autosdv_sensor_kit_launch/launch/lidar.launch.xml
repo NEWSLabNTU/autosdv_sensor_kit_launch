@@ -1,17 +1,19 @@
 <launch>
   <arg name="launch_driver" default="true"/>
-  <arg name="lidar_model" default="robin-w" description="cube1 or robin-w"/>
-  <arg name="host_ip" default="192.168.26.1"/>
+  <arg name="lidar_model" default="robin-w" description="cube1, robin-w, or vlp32c"/>
+  <!-- <arg name="host_ip" default="192.168.26.1"/> -->
   <arg name="use_concat_filter" default="true"/>
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
   <arg name="vehicle_mirror_param_file"/>
   <arg name="use_pointcloud_container" default="false" description="launch pointcloud container"/>
   <arg name="pointcloud_container_name" default="pointcloud_container"/>
+  <arg name="robin_w_device_ip" default="172.168.1.10"/>
+  <arg name="vlp32c_device_ip" default="192.168.1.201"/>
 
   <group>
     <push-ros-namespace namespace="lidar"/>
-    <group>
 
+    <group>
       <group if="$(eval &quot;'$(var lidar_model)'=='cube1'&quot;)">
 	<include file="$(find-pkg-share blickfeld_driver)/launch/live_scanner_component.launch.py" if="$(var launch_driver)">
 	</include>
@@ -19,17 +21,42 @@
 
       <group if="$(eval &quot;'$(var lidar_model)'=='robin-w'&quot;)">
 	<include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/ivu_pc2.py" if="$(var launch_driver)">
+          <arg name="device_ip" value="$(var robin_w_device_ip)"/>
 	</include>
+      </group>
+
+      <group if="$(eval &quot;'$(var lidar_model)'=='vlp32c'&quot;)">
+        <include file="$(find-pkg-share velodyne_driver)/launch/velodyne_driver_node-VLP32C-launch.py" if="$(var launch_driver)">
+          <arg name="calibration" value="$(find-pkg-share velodyne_pointcloud)/params/VLP-32C.yaml"/>
+          <arg name="device_ip" value="$(var vlp32c_device_ip)"/>
+          <arg name="frame_id" value="velodyne_top"/>
+          <arg name="scan_phase" value="0.0"/>
+          <arg name="reading_once" value="false"/>
+          <arg name="model" value="32C"/>
+          <arg name="rpm" value="600.0"/>
+          <arg name="port" value="2368"/>
+          <arg name="topic_name" value="points_raw"/>
+        </include>
+
+        <include file="$(find-pkg-share velodyne_pointcloud)/launch/velodyne_transform_node-VLP32C-launch.py" if="$(var launch_driver)">
+          <arg name="calibration" value="$(find-pkg-share velodyne_pointcloud)/params/VeloView-VLP-32C.yaml"/>
+          <arg name="frame_id" value="velodyne_top"/>
+          <arg name="topic_pointcloud" value="points_raw"/>
+          <arg name="topic_description" value="description"/>
+          <arg name="cut_angle" value="-0.01"/>
+          <arg name="max_range" value="200.0"/>
+          <arg name="min_range" value="0.4"/>
+          <arg name="mode" value="strongest"/>
+        </include>
       </group>
     </group>
 
-
-    <!-- <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/pointcloud_preprocessor.launch.py"> -->
-    <!--   <arg name="base_frame" value="base_link"/> -->
-    <!--   <arg name="use_intra_process" value="true"/> -->
-    <!--   <arg name="use_multithread" value="true"/> -->
-    <!--   <arg name="use_pointcloud_container" value="$(var use_pointcloud_container)"/> -->
-    <!--   <arg name="container_name" value="$(var pointcloud_container_name)"/> -->
-    <!-- </include> -->
+    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/pointcloud_preprocessor.launch.py" if="$(eval &quot;'$(var lidar_model)'=='vlp32c'&quot;)">
+      <arg name="base_frame" value="base_link"/>
+      <arg name="use_intra_process" value="true"/>
+      <arg name="use_multithread" value="true"/>
+      <arg name="use_pointcloud_container" value="$(var use_pointcloud_container)"/>
+      <arg name="container_name" value="$(var pointcloud_container_name)"/>
+    </include>
   </group>
 </launch>
