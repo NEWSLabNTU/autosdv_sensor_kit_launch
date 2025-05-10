@@ -8,7 +8,7 @@
   <arg name="use_pointcloud_container" default="false" description="launch pointcloud container"/>
   <arg name="pointcloud_container_name" default="pointcloud_container"/>
   <arg name="robin_w_device_ip" default="172.168.1.10"/>
-  <arg name="vlp32c_device_ip" default="192.168.1.201"/>
+  <arg name="vlp32c_device_ip" default="192.168.7.10"/>
 
   <group>
     <push-ros-namespace namespace="lidar"/>
