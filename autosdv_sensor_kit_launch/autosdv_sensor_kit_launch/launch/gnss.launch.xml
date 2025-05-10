@@ -28,7 +28,7 @@
     <group if="$(eval &quot;'$(var launch_driver)' and '$(var gnss_receiver)'=='garmin'&quot;)">
       <!-- <include file="$(find-pkg-share gpsd_client)/launch/gpsd_client-launch.py"/> -->
       <push-ros-namespace namespace="garmin"/>
-      <node pkg="nmea_navsat_driver" exec="nmea_topic_serial_reader" name="nmea_topic_serial_reader">
+      <node pkg="nmea_reader" exec="nmea_reader" name="new_serial_reader">
         <param name="port" value="/dev/ttyUSB0"/>
         <param name="baud" value="9600"/>
         <param name="frame_id" value="gps"/>
