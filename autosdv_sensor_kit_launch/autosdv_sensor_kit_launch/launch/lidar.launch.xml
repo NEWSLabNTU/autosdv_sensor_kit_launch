@@ -1,6 +1,6 @@
 <launch>
   <arg name="launch_driver" default="true"/>
-  <arg name="lidar_model" default="robin-w" description="cube1, robin-w, or vlp32c"/>
+  <arg name="lidar_model" default="vlp32c" description="cube1, robin-w, or vlp32c"/>
   <!-- <arg name="host_ip" default="192.168.26.1"/> -->
   <arg name="use_concat_filter" default="true"/>
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
