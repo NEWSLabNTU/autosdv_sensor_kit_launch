@@ -26,28 +26,11 @@
       </group>
 
       <group if="$(eval &quot;'$(var lidar_model)'=='vlp32c'&quot;)">
-        <include file="$(find-pkg-share velodyne_driver)/launch/velodyne_driver_node-VLP32C-launch.py" if="$(var launch_driver)">
-          <arg name="calibration" value="$(find-pkg-share velodyne_pointcloud)/params/VLP-32C.yaml"/>
-          <arg name="device_ip" value="$(var vlp32c_device_ip)"/>
-          <arg name="frame_id" value="velodyne_top"/>
-          <arg name="scan_phase" value="0.0"/>
-          <arg name="reading_once" value="false"/>
-          <arg name="model" value="32C"/>
-          <arg name="rpm" value="600.0"/>
-          <arg name="port" value="2368"/>
-          <arg name="topic_name" value="points_raw"/>
-        </include>
-
-        <include file="$(find-pkg-share velodyne_pointcloud)/launch/velodyne_transform_node-VLP32C-launch.py" if="$(var launch_driver)">
-          <arg name="calibration" value="$(find-pkg-share velodyne_pointcloud)/params/VeloView-VLP-32C.yaml"/>
-          <arg name="frame_id" value="velodyne_top"/>
-          <arg name="topic_pointcloud" value="points_raw"/>
-          <arg name="topic_description" value="description"/>
-          <arg name="cut_angle" value="-0.01"/>
-          <arg name="max_range" value="200.0"/>
-          <arg name="min_range" value="0.4"/>
-          <arg name="mode" value="strongest"/>
-        </include>
+        <include file="$(find-pkg-share nebula_ros)/launch/velodyne_launch_all_hw.xml" if="$(var launch_driver)">
+	  <arg name="sensor_model" value="VLP32" />
+	  <arg name="launch_hw" value="true" />
+	  <arg name="config_file" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/VLP32.param.yaml" />
+	</include>
       </group>
     </group>
 
