@@ -4,7 +4,7 @@
   <!-- <arg name="host_ip" default="192.168.26.1"/> -->
   <arg name="use_concat_filter" default="true"/>
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
-  <arg name="vehicle_mirror_param_file"/>
+  <arg name="vehicle_mirror_param_file" default="$(find-pkg-share autosdv_vehicle_description)/config/mirror.param.yaml"/>
   <arg name="pointcloud_container_name" default="pointcloud_container"/>
   <arg name="robin_w_device_ip" default="172.168.1.10"/>
   <arg name="vlp32c_device_ip" default="192.168.7.10"/>
@@ -25,21 +25,10 @@
       </group>
 
       <group if="$(eval &quot;'$(var lidar_model)'=='vlp32c'&quot;)">
-        <include file="$(find-pkg-share common_sensor_launch)/launch/nebula_node_container.launch.py">
-          <arg name="launch_driver" value="$(var launch_driver)"/>
+        <include file="$(find-pkg-share nebula_ros)/launch/velodyne_launch_all_hw.xml">
           <arg name="sensor_model" value="VLP32"/>
-          <arg name="max_range" value="130.0"/>
-          <arg name="min_range" value="0.4"/>
-          <arg name="sensor_frame" value="velodyne"/>
-          <arg name="return_mode" value="SingleStrongest"/>
-          <arg name="sensor_ip" value="$(var vlp32c_device_ip)"/>
-          <arg name="host_ip" value="255.255.255.255"/>
-          <arg name="data_port" value="2368"/>
-          <arg name="scan_phase" value="0.0"/>
-          <arg name="cloud_min_angle" value="0"/>
-          <arg name="cloud_max_angle" value="360"/>
-          <arg name="vehicle_mirror_param_file" value="$(var vehicle_mirror_param_file)"/>
-          <arg name="container_name" value="$(var pointcloud_container_name)"/>
+          <arg name="launch_hw" value="$(var launch_driver)"/>
+          <arg name="config_file" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/VLP32.param.yaml"/>
         </include>
       </group>
     </group>
