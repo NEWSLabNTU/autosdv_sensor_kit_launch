@@ -14,7 +14,7 @@
 
     <group>
       <group if="$(eval &quot;'$(var lidar_model)'=='cube1'&quot;)">
-	<include file="$(find-pkg-share blickfeld_driver)/launch/live_scanner_component.launch.py" if="$(var launch_driver)">
+	<include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/cube1.launch.py" if="$(var launch_driver)">
 	</include>
       </group>
 
