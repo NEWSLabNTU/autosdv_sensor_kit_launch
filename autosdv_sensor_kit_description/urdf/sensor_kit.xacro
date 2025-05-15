@@ -3,8 +3,9 @@
   <xacro:macro name="sensor_kit_macro" params="parent x y z roll pitch yaw">
     <xacro:include filename="$(find zed_wrapper)/urdf/zed_macro.urdf.xacro"/>
     <xacro:include filename="$(find imu_description)/urdf/imu.xacro"/>
+    <xacro:include filename="$(find blickfeld_driver)/config/blickfeld_cube1.xacro"/>
     <xacro:arg name="gpu" default="false"/>
-    <xacro:arg name="config_dir" default="$(find autosdv_sensor_kit_description)/config"/>
+    <xacro:arg name="config_dir" default="$(find autosdv_sensor_kit_description)/config"/>b
 
     <xacro:property name="sensor_kit_base_link" default="sensor_kit_base_link"/>
 
@@ -20,28 +21,72 @@
     <!-- sensor -->
     <xacro:property name="calibration" value="${xacro.load_yaml('$(arg config_dir)/sensor_kit_calibration.yaml')}"/>
 
-    <!-- lidar -->
-    <joint name="lidar_joint" type="fixed">
-      <origin  
-        xyz="${calibration['sensor_kit_base_link']['lidar']['x']}
-             ${calibration['sensor_kit_base_link']['lidar']['y']}
-             ${calibration['sensor_kit_base_link']['lidar']['z']}"
-        rpy="${calibration['sensor_kit_base_link']['lidar']['roll']}
-             ${calibration['sensor_kit_base_link']['lidar']['pitch']}
-             ${calibration['sensor_kit_base_link']['lidar']['yaw']}"
+    <!-- Blickfeld Cube 1 LiDAR -->
+    <joint name="cube1_joint" type="fixed">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['cube1']['x']}
+             ${calibration['sensor_kit_base_link']['cube1']['y']}
+             ${calibration['sensor_kit_base_link']['cube1']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['cube1']['roll']}
+             ${calibration['sensor_kit_base_link']['cube1']['pitch']}
+             ${calibration['sensor_kit_base_link']['cube1']['yaw']}"
       />
       <parent link="sensor_kit_base_link"/>
-      <child link="lidar"/>
+      <child link="cube1"/>
     </joint>
-    
-    <link name="lidar">
+
+    <link name="cube1">
       <inertial>
         <mass value="0.1"/>
         <origin xyz="0 0 0"/>
         <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
       </inertial>
     </link>
-    
+
+    <!-- Velodyne VLP-32C LiDAR -->
+    <joint name="vlp32c_joint" type="fixed">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['vlp32c']['x']}
+             ${calibration['sensor_kit_base_link']['vlp32c']['y']}
+             ${calibration['sensor_kit_base_link']['vlp32c']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['vlp32c']['roll']}
+             ${calibration['sensor_kit_base_link']['vlp32c']['pitch']}
+             ${calibration['sensor_kit_base_link']['vlp32c']['yaw']}"
+      />
+      <parent link="sensor_kit_base_link"/>
+      <child link="vlp32c"/>
+    </joint>
+
+    <link name="vlp32c">
+      <inertial>
+        <mass value="0.1"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+      </inertial>
+    </link>
+
+    <!-- Seyond Robin-W LiDAR -->
+    <joint name="robin_w_joint" type="fixed">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['robin_w']['x']}
+             ${calibration['sensor_kit_base_link']['robin_w']['y']}
+             ${calibration['sensor_kit_base_link']['robin_w']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['robin_w']['roll']}
+             ${calibration['sensor_kit_base_link']['robin_w']['pitch']}
+             ${calibration['sensor_kit_base_link']['robin_w']['yaw']}"
+      />
+      <parent link="sensor_kit_base_link"/>
+      <child link="robin_w"/>
+    </joint>
+
+    <link name="robin_w">
+      <inertial>
+        <mass value="0.1"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+      </inertial>
+    </link>
+
     <!-- imu -->
     <joint name="imu_joint" type="fixed">
       <origin
@@ -76,7 +121,7 @@
       />
       <parent link="sensor_kit_base_link"/>
       <child link="gnss_base_link"/>
-    </joint> 
+    </joint>
     <link name="gnss_base_link">
       <inertial>
         <mass value="0.1"/>
