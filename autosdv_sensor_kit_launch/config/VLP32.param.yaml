@@ -7,7 +7,7 @@
     packet_mtu_size: 1500
     launch_hw: true
     setup_sensor: true
-    frame_id: velodyne
+    frame_id: vlp32c
     advanced_diagnostics: false
     diag_span: 1000
     calibration_file: $(find-pkg-share nebula_decoders)/calibration/velodyne/VLP32.yaml
