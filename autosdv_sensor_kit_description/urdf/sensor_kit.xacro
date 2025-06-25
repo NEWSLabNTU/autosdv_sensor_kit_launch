@@ -5,7 +5,7 @@
     <xacro:include filename="$(find imu_description)/urdf/imu.xacro"/>
     <xacro:include filename="$(find blickfeld_driver)/config/blickfeld_cube1.xacro"/>
     <xacro:arg name="gpu" default="false"/>
-    <xacro:arg name="config_dir" default="$(find autosdv_sensor_kit_description)/config"/>b
+    <xacro:arg name="config_dir" default="$(find individual_params)/config/default/autosdv_sensor_kit"/>b
 
     <xacro:property name="sensor_kit_base_link" default="sensor_kit_base_link"/>
 
@@ -154,6 +154,131 @@
              ${calibration['sensor_kit_base_link']['zedxm_camera_link']['yaw']}"
       />
     </xacro:zed_camera>
+
+    <!-- USB Cameras -->
+    <!-- Front USB Camera -->
+    <joint name="usb_camera_front_joint" type="fixed">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['usb_camera_front']['x']}
+             ${calibration['sensor_kit_base_link']['usb_camera_front']['y']}
+             ${calibration['sensor_kit_base_link']['usb_camera_front']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['usb_camera_front']['roll']}
+             ${calibration['sensor_kit_base_link']['usb_camera_front']['pitch']}
+             ${calibration['sensor_kit_base_link']['usb_camera_front']['yaw']}"
+      />
+      <parent link="sensor_kit_base_link"/>
+      <child link="usb_camera_front_link"/>
+    </joint>
+    <link name="usb_camera_front_link">
+      <visual>
+        <geometry>
+          <box size="0.03 0.08 0.03"/>
+        </geometry>
+        <material name="black">
+          <color rgba="0.1 0.1 0.1 1.0"/>
+        </material>
+      </visual>
+    </link>
+    <!-- Front camera optical frame -->
+    <joint name="usb_camera_front_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+      <parent link="usb_camera_front_link"/>
+      <child link="usb_camera_front_optical_link"/>
+    </joint>
+    <link name="usb_camera_front_optical_link"/>
+
+    <!-- Rear USB Camera -->
+    <joint name="usb_camera_rear_joint" type="fixed">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['usb_camera_rear']['x']}
+             ${calibration['sensor_kit_base_link']['usb_camera_rear']['y']}
+             ${calibration['sensor_kit_base_link']['usb_camera_rear']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['usb_camera_rear']['roll']}
+             ${calibration['sensor_kit_base_link']['usb_camera_rear']['pitch']}
+             ${calibration['sensor_kit_base_link']['usb_camera_rear']['yaw']}"
+      />
+      <parent link="sensor_kit_base_link"/>
+      <child link="usb_camera_rear_link"/>
+    </joint>
+    <link name="usb_camera_rear_link">
+      <visual>
+        <geometry>
+          <box size="0.03 0.08 0.03"/>
+        </geometry>
+        <material name="black">
+          <color rgba="0.1 0.1 0.1 1.0"/>
+        </material>
+      </visual>
+    </link>
+    <!-- Rear camera optical frame -->
+    <joint name="usb_camera_rear_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+      <parent link="usb_camera_rear_link"/>
+      <child link="usb_camera_rear_optical_link"/>
+    </joint>
+    <link name="usb_camera_rear_optical_link"/>
+
+    <!-- Left USB Camera -->
+    <joint name="usb_camera_left_joint" type="fixed">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['usb_camera_left']['x']}
+             ${calibration['sensor_kit_base_link']['usb_camera_left']['y']}
+             ${calibration['sensor_kit_base_link']['usb_camera_left']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['usb_camera_left']['roll']}
+             ${calibration['sensor_kit_base_link']['usb_camera_left']['pitch']}
+             ${calibration['sensor_kit_base_link']['usb_camera_left']['yaw']}"
+      />
+      <parent link="sensor_kit_base_link"/>
+      <child link="usb_camera_left_link"/>
+    </joint>
+    <link name="usb_camera_left_link">
+      <visual>
+        <geometry>
+          <box size="0.03 0.08 0.03"/>
+        </geometry>
+        <material name="black">
+          <color rgba="0.1 0.1 0.1 1.0"/>
+        </material>
+      </visual>
+    </link>
+    <!-- Left camera optical frame -->
+    <joint name="usb_camera_left_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+      <parent link="usb_camera_left_link"/>
+      <child link="usb_camera_left_optical_link"/>
+    </joint>
+    <link name="usb_camera_left_optical_link"/>
+
+    <!-- Right USB Camera -->
+    <joint name="usb_camera_right_joint" type="fixed">
+      <origin
+        xyz="${calibration['sensor_kit_base_link']['usb_camera_right']['x']}
+             ${calibration['sensor_kit_base_link']['usb_camera_right']['y']}
+             ${calibration['sensor_kit_base_link']['usb_camera_right']['z']}"
+        rpy="${calibration['sensor_kit_base_link']['usb_camera_right']['roll']}
+             ${calibration['sensor_kit_base_link']['usb_camera_right']['pitch']}
+             ${calibration['sensor_kit_base_link']['usb_camera_right']['yaw']}"
+      />
+      <parent link="sensor_kit_base_link"/>
+      <child link="usb_camera_right_link"/>
+    </joint>
+    <link name="usb_camera_right_link">
+      <visual>
+        <geometry>
+          <box size="0.03 0.08 0.03"/>
+        </geometry>
+        <material name="black">
+          <color rgba="0.1 0.1 0.1 1.0"/>
+        </material>
+      </visual>
+    </link>
+    <!-- Right camera optical frame -->
+    <joint name="usb_camera_right_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+      <parent link="usb_camera_right_link"/>
+      <child link="usb_camera_right_optical_link"/>
+    </joint>
+    <link name="usb_camera_right_optical_link"/>
 
   </xacro:macro>
 </robot>

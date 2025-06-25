@@ -4,6 +4,10 @@
   <arg name="pointcloud_container_name" default="pointcloud_container"/>
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
 
+  <!-- Camera configuration arguments -->
+  <arg name="use_zed_camera" default="true" description="Enable ZED camera"/>
+  <arg name="use_usb_cameras" default="false" description="Enable USB cameras"/>
+
   <group>
     <!-- LiDAR Driver -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/lidar.launch.xml">
@@ -15,8 +19,10 @@
     <!-- Camera Driver -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/camera.launch.xml">
       <arg name="launch_driver" value="$(var launch_driver)" />
+      <arg name="use_zed_camera" value="$(var use_zed_camera)" />
+      <arg name="use_usb_cameras" value="$(var use_usb_cameras)" />
     </include>
-    
+
     <!-- IMU Driver -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/imu.launch.xml">
       <arg name="launch_driver" value="$(var launch_driver)"/>
