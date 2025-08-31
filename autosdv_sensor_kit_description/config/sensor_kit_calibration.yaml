@@ -1,0 +1,43 @@
+sensor_kit_base_link:
+  cube1: # Blickfeld Cube 1 LiDAR
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+  vlp32c: # Velodyne VLP-32C LiDAR
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+  robin_w: # Seyond Robin-W LiDAR
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+  zedxm_camera_link:
+    x: -0.030364650149994368
+    y: 0.10463870758507521
+    z: -0.10047671811207715
+    roll: -0.02233100028929886
+    pitch: -0.03488869792395339
+    yaw: 1.5829121807383153
+  imu_link:
+    x: 0.000000
+    y: 0.000000
+    z: -0.055
+    roll: 0.000000
+    pitch: 0.00000
+    yaw: 0.000000
+  gnss_base_link:
+    x: 0.000000
+    y: 0.000000
+    z: 0.055  # random value
+    roll: 0.000000
+    pitch: 0.00000
+    yaw: 0.000000
