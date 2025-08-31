@@ -17,7 +17,7 @@
   <exec_depend>ublox_gps</exec_depend>
   <exec_depend>usb_cam</exec_depend>
   <exec_depend>nmea_navsat_driver</exec_depend>
-  <exec_depend>innovusion</exec_depend>
+  <exec_depend>seyond</exec_depend>
   <exec_depend>gscam</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>

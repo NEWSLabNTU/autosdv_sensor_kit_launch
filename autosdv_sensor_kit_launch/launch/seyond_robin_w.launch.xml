@@ -1,0 +1,55 @@
+<launch>
+  <!-- Seyond Robin-W LiDAR Launch File for AutoSDV -->
+  <!-- Migration from innovusion driver to official Seyond driver -->
+
+  <!-- Arguments with defaults matching previous robin-w.launch.py -->
+  <arg name="frame_id" default="robin_w" description="ROS frame ID"/>
+  <arg name="device_ip" default="172.168.1.10" description="LiDAR IP address"/>
+  <arg name="udp_port" default="8010" description="UDP port for data reception"/>
+  <arg name="lidar_name" default="falcon" description="LiDAR name (Robin-W codename)"/>
+  <arg name="aggregate_num" default="10" description="Number of packets to aggregate"/>
+  <arg name="reflectance_mode" default="True" description="Enable reflectance mode"/>
+  <arg name="multiple_return" default="1" description="Multiple return mode (1/2/3)"/>
+  <arg name="packet_mode" default="False" description="Enable packet topic output"/>
+  <arg name="max_range" default="200.0" description="Maximum range in meters"/>
+  <arg name="min_range" default="0.4" description="Minimum range in meters"/>
+  <arg name="coordinate_mode" default="0" description="Coordinate mode (0-4)"/>
+
+  <!-- Optional arguments -->
+  <arg name="replay_rosbag" default="False" description="Replay from rosbag"/>
+  <arg name="pcap_file" default="" description="Path to PCAP file for replay"/>
+  <arg name="log_level" default="info" description="Log level for LiDAR driver"/>
+
+  <!-- Topic remapping for AutoSDV compatibility -->
+  <arg name="frame_topic" default="/sensing/lidar/robin_w/pointcloud_raw"
+       description="Output point cloud topic"/>
+  <arg name="packet_topic" default="/sensing/lidar/robin_w/packets"
+       description="Output packet topic"/>
+
+  <!-- Launch the Seyond driver node -->
+  <include file="$(find-pkg-share seyond)/launch/start.py">
+    <!-- Core parameters -->
+    <arg name="frame_id" value="$(var frame_id)"/>
+    <arg name="lidar_ip" value="$(var device_ip)"/>
+    <arg name="udp_port" value="$(var udp_port)"/>
+    <arg name="lidar_name" value="$(var lidar_name)"/>
+    <arg name="aggregate_num" value="$(var aggregate_num)"/>
+    <arg name="reflectance_mode" value="$(var reflectance_mode)"/>
+    <arg name="multiple_return" value="$(var multiple_return)"/>
+    <arg name="packet_mode" value="$(var packet_mode)"/>
+
+    <!-- Topic configuration -->
+    <arg name="frame_topic" value="$(var frame_topic)"/>
+    <arg name="packet_topic" value="$(var packet_topic)"/>
+
+    <!-- Optional parameters -->
+    <arg name="replay_rosbag" value="$(var replay_rosbag)"/>
+    <arg name="pcap_file" value="$(var pcap_file)"/>
+    <arg name="log_level" value="$(var log_level)"/>
+
+    <!-- Range configuration (Note: Seyond driver may handle these internally) -->
+    <arg name="max_range" value="$(var max_range)"/>
+    <arg name="min_range" value="$(var min_range)"/>
+    <arg name="coordinate_mode" value="$(var coordinate_mode)"/>
+  </include>
+</launch>
