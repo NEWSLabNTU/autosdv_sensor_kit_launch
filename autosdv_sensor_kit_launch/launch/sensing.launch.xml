@@ -5,8 +5,7 @@
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
 
   <!-- Camera configuration arguments -->
-  <arg name="use_zed_camera" default="true" description="Enable ZED camera"/>
-  <arg name="use_usb_cameras" default="false" description="Enable USB cameras"/>
+  <arg name="camera_model" default="zedxm" description="Camera model (zedxm, usb, or none)"/>
 
   <group>
     <!-- LiDAR Driver -->
@@ -19,8 +18,7 @@
     <!-- Camera Driver -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/camera.launch.xml">
       <arg name="launch_driver" value="$(var launch_driver)" />
-      <arg name="use_zed_camera" value="$(var use_zed_camera)" />
-      <arg name="use_usb_cameras" value="$(var use_usb_cameras)" />
+      <arg name="camera_model" value="$(var camera_model)" />
     </include>
 
     <!-- IMU Driver -->
