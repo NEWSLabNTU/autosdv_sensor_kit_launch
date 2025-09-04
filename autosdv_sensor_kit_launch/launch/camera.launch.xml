@@ -21,11 +21,13 @@
 
   <!-- ZED Camera Group -->
   <group if="$(var use_zed_camera)">
+    <!-- Load ZED into shared pointcloud_container for zero-copy benefit -->
     <push-ros-namespace namespace="camera"/>
-
     <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py" if="$(var launch_driver)">
       <arg name="camera_name" value="$(var camera_model)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
+      <!-- Don't pass namespace arg, let push-ros-namespace handle it -->
+      <arg name="container_name" value="/pointcloud_container"/>
     </include>
   </group>
 
