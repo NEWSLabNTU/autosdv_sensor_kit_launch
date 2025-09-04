@@ -27,6 +27,7 @@ from launch_ros.descriptions import ComposableNode
 def launch_setup(context, *args, **kwargs):
     # Get the lidar model from launch configuration
     lidar_model = LaunchConfiguration("lidar_model").perform(context)
+    use_single_lidar = LaunchConfiguration("use_single_lidar").perform(context)
 
     # Define valid lidar models and their corresponding topics
     valid_lidar_models = {
@@ -42,34 +43,58 @@ def launch_setup(context, *args, **kwargs):
 
     input_topic = valid_lidar_models[lidar_model]
 
-    # set concat filter as a component
-    concat_component = ComposableNode(
-        package="autoware_pointcloud_preprocessor",
-        plugin="autoware::pointcloud_preprocessor::PointCloudConcatenateDataSynchronizerComponent",
-        name="concatenate_data",
-        remappings=[
-            ("~/input/twist", "/sensing/vehicle_velocity_converter/twist_with_covariance"),
-            ("output", "concatenated/pointcloud"),
-        ],
-        parameters=[
-            {
-                "input_topics": [input_topic, input_topic],
-                "output_frame": LaunchConfiguration("base_frame"),
-                "input_twist_topic_type": "twist",
-                "publish_synchronized_pointcloud": True,
-            }
-        ],
-        extra_arguments=[{"use_intra_process_comms": LaunchConfiguration("use_intra_process")}],
-    )
+    # For single LiDAR, use a passthrough filter with frame transformation
+    if use_single_lidar == "true":
+        # Use passthrough filter component for single LiDAR
+        passthrough_component = ComposableNode(
+            package="autoware_pointcloud_preprocessor",
+            plugin="autoware::pointcloud_preprocessor::PassThroughFilterComponent",
+            name="passthrough_as_concatenate",
+            remappings=[
+                ("input", input_topic),
+                ("output", "concatenated/pointcloud"),
+            ],
+            parameters=[
+                {
+                    "output_frame": LaunchConfiguration("base_frame"),
+                    "remove_nan": True,  # Remove NaN points
+                    "float_min": -999.0,  # Don't filter by range
+                    "float_max": 999.0,   # Don't filter by range
+                }
+            ],
+            extra_arguments=[{"use_intra_process_comms": LaunchConfiguration("use_intra_process")}],
+        )
+        components = [passthrough_component]
+    else:
+        # Multi-LiDAR: use concatenate component
+        concat_component = ComposableNode(
+            package="autoware_pointcloud_preprocessor",
+            plugin="autoware::pointcloud_preprocessor::PointCloudConcatenateDataSynchronizerComponent",
+            name="concatenate_data",
+            remappings=[
+                ("~/input/twist", "/sensing/vehicle_velocity_converter/twist_with_covariance"),
+                ("output", "concatenated/pointcloud"),
+            ],
+            parameters=[
+                {
+                    "input_topics": [input_topic, input_topic],  # Still need at least 2 topics
+                    "output_frame": LaunchConfiguration("base_frame"),
+                    "input_twist_topic_type": "twist",
+                    "publish_synchronized_pointcloud": True,
+                }
+            ],
+            extra_arguments=[{"use_intra_process_comms": LaunchConfiguration("use_intra_process")}],
+        )
+        components = [concat_component]
 
-    # load concat or passthrough filter
-    concat_loader = LoadComposableNodes(
-        composable_node_descriptions=[concat_component],
+    # load components
+    component_loader = LoadComposableNodes(
+        composable_node_descriptions=components,
         target_container=LaunchConfiguration("pointcloud_container_name"),
         condition=IfCondition(LaunchConfiguration("use_concat_filter")),
     )
 
-    return [concat_loader]
+    return [component_loader]
 
 
 def generate_launch_description():
@@ -83,6 +108,7 @@ def generate_launch_description():
     add_launch_arg("use_intra_process", "False")
     add_launch_arg("pointcloud_container_name", "pointcloud_container")
     add_launch_arg("use_concat_filter", "True")
+    add_launch_arg("use_single_lidar", "true")  # Default to single LiDAR mode
     add_launch_arg("lidar_model", "vlp32c")  # Default to velodyne lidar
 
     set_container_executable = SetLaunchConfiguration(
