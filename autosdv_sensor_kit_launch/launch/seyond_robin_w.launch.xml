@@ -27,8 +27,8 @@
        description="Output packet topic"/>
 
   <!-- Launch the Seyond driver node -->
-  <include file="$(find-pkg-share seyond)/launch/start.py">
-    <!-- Core parameters -->
+  <include file="$(find-pkg-share seyond)/start.py">
+    <!-- Core parameters matching Seyond driver interface -->
     <arg name="frame_id" value="$(var frame_id)"/>
     <arg name="lidar_ip" value="$(var device_ip)"/>
     <arg name="udp_port" value="$(var udp_port)"/>
@@ -38,18 +38,12 @@
     <arg name="multiple_return" value="$(var multiple_return)"/>
     <arg name="packet_mode" value="$(var packet_mode)"/>
 
-    <!-- Topic configuration -->
-    <arg name="frame_topic" value="$(var frame_topic)"/>
-    <arg name="packet_topic" value="$(var packet_topic)"/>
+    <!-- Topic configuration - use simpler topic names that match Seyond -->
+    <arg name="frame_topic" value="iv_points"/>
+    <arg name="packet_topic" value="iv_packets"/>
 
     <!-- Optional parameters -->
     <arg name="replay_rosbag" value="$(var replay_rosbag)"/>
-    <arg name="pcap_file" value="$(var pcap_file)"/>
     <arg name="log_level" value="$(var log_level)"/>
-
-    <!-- Range configuration (Note: Seyond driver may handle these internally) -->
-    <arg name="max_range" value="$(var max_range)"/>
-    <arg name="min_range" value="$(var min_range)"/>
-    <arg name="coordinate_mode" value="$(var coordinate_mode)"/>
   </include>
 </launch>
