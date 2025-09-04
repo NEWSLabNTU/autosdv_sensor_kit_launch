@@ -7,6 +7,10 @@
   <!-- Camera configuration arguments -->
   <arg name="camera_model" default="zedxm" description="Camera model (zedxm, usb, or none)"/>
 
+  <!-- GNSS configuration arguments -->
+  <arg name="gnss_receiver" default="garmin" description="GNSS receiver type (ublox, septentrio, or garmin)"/>
+  <arg name="use_gnss" default="true" description="Enable GNSS for outdoor operation"/>
+
   <group>
     <!-- LiDAR Driver -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/lidar.launch.xml">
@@ -27,8 +31,9 @@
     </include>
 
     <!-- GNSS Driver -->
-    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/gnss.launch.xml">
+    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/gnss.launch.xml" if="$(var use_gnss)">
       <arg name="launch_driver" value="$(var launch_driver)"/>
+      <arg name="gnss_receiver" value="$(var gnss_receiver)"/>
     </include>
 
     <!-- Vehicle Velocity Converter  -->
