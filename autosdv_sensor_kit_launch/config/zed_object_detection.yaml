@@ -1,0 +1,56 @@
+/**:
+  ros__parameters:
+    # Object Detection Configuration for ZED Camera
+    object_detection:
+      od_enabled: true  # Enable object detection
+      model: 'MULTI_CLASS_BOX_ACCURATE'  # Options: MULTI_CLASS_BOX_FAST, MULTI_CLASS_BOX_MEDIUM, MULTI_CLASS_BOX_ACCURATE
+      allow_reduced_precision_inference: true  # Allow reduced precision for better performance on Jetson
+      max_range: 20.0  # Maximum detection range in meters
+      confidence_threshold: 40.0  # Minimum confidence threshold (0-100)
+      object_tracking_enabled: true  # Enable object tracking
+      prediction_timeout: 0.5  # Prediction timeout in seconds
+      filtering_mode: 1  # Integer: 0=NONE, 1=NMS3D, 2=NMS3D_PER_CLASS
+
+      # Multi-class detection settings
+      mc_people: true      # Detect people
+      mc_vehicle: true     # Detect vehicles
+      mc_animal: true      # Detect animals
+      mc_bag: false        # Detect bags
+      mc_electronics: false # Detect electronics
+      mc_fruit_vegetable: false # Detect fruits/vegetables
+      mc_sport: false      # Detect sports equipment
+
+    # Body Tracking Configuration (optional, disabled by default)
+    body_tracking:
+      bt_enabled: false  # Disable body tracking for better performance
+      model: 'HUMAN_BODY_FAST'  # Options: HUMAN_BODY_FAST, HUMAN_BODY_MEDIUM, HUMAN_BODY_ACCURATE
+      body_format: 'BODY_18'  # Body format
+      allow_reduced_precision_inference: true
+      max_range: 10.0
+      confidence_threshold: 50.0
+      minimum_keypoints_threshold: 5
+      enable_tracking: true
+      enable_body_fitting: false
+      prediction_timeout_s: 0.5
+      body_kp_selection: 'FULL'  # FULL, UPPER_BODY
+
+    # Debug settings
+    debug:
+      debug_object_detection: false
+      debug_body_tracking: false
+
+    # General settings (keep existing ZED settings)
+    general:
+      camera_model: 'zedxm'
+      pub_resolution: 'NATIVE'  # Use native resolution
+      pub_frame_rate: 15.0  # Publish rate for object detection
+
+    # Point cloud settings (ensure point cloud is published)
+    point_cloud:
+      point_cloud_enabled: true  # Always publish point cloud
+      point_cloud_freq: 15.0  # Point cloud publish rate
+
+    # Depth settings
+    depth:
+      min_depth: 0.3  # Minimum depth in meters
+      max_depth: 20.0  # Maximum depth in meters

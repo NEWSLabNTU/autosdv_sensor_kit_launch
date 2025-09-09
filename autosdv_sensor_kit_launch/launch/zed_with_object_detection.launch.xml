@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch arguments -->
+  <arg name="camera_name" default="zedxm" description="Camera name"/>
+  <arg name="camera_model" default="zedxm" description="Camera model (zed, zedm, zed2, zed2i, zedx, zedxm)"/>
+  <arg name="enable_zed_object_detection" default="false" description="Enable ZED object detection"/>
+  <arg name="use_autoware_converter" default="true" description="Convert ZED objects to Autoware format"/>
+  <arg name="container_name" default="/pointcloud_container" description="Container name for component loading"/>
+
+  <!-- Config file paths -->
+  <let name="zed_config_file" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_object_detection.yaml"/>
+
+  <!-- Launch ZED camera with appropriate configuration -->
+  <group if="$(var enable_zed_object_detection)">
+    <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py">
+      <arg name="camera_name" value="$(var camera_name)"/>
+      <arg name="camera_model" value="$(var camera_model)"/>
+      <arg name="container_name" value="$(var container_name)"/>
+      <arg name="ros_params_override_path" value="$(var zed_config_file)"/>
+    </include>
+  </group>
+  <group unless="$(var enable_zed_object_detection)">
+    <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py">
+      <arg name="camera_name" value="$(var camera_name)"/>
+      <arg name="camera_model" value="$(var camera_model)"/>
+      <arg name="container_name" value="$(var container_name)"/>
+    </include>
+  </group>
+
+  <!-- Object detection is enabled via configuration file (od_enabled: true) -->
+  <!-- No service call needed when using config override -->
+
+  <!-- Launch Autoware ZED converter if object detection is enabled -->
+  <group if="$(eval &quot;'$(var enable_zed_object_detection)'=='true' and '$(var use_autoware_converter)'=='true'&quot;)">
+    <include file="$(find-pkg-share autoware_zed_converter)/launch/converter_node.launch.xml">
+      <arg name="node_name" value="zed_object_converter"/>
+      <arg name="input_topic" value="/sensing/camera/$(var camera_name)/zed_node/obj_det/objects"/>
+      <arg name="output_topic" value="/perception/object_recognition/detection/camera_objects"/>
+      <arg name="use_tracking_velocity" value="true"/>
+      <arg name="existence_probability_threshold" value="0.4"/>
+    </include>
+  </group>
+</launch>

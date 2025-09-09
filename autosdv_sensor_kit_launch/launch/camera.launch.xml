@@ -2,6 +2,8 @@
   <arg name="launch_driver" default="true"/>
   <arg name="camera_type" default="left"/>
   <arg name="camera_model" default="zedxm" description="Camera model (zedxm, usb, or none)"/>
+  <arg name="enable_zed_object_detection" default="false" description="Enable ZED object detection"/>
+  <arg name="use_autoware_converter" default="true" description="Convert ZED objects to Autoware format"/>
 
   <!-- Individual USB Camera Arguments -->
   <arg name="use_front_camera" default="true"/>
@@ -19,10 +21,13 @@
   <group if="$(eval &quot;'$(var camera_model)'=='zedxm'&quot;)">
     <!-- Load ZED into shared pointcloud_container for zero-copy benefit -->
     <push-ros-namespace namespace="camera"/>
-    <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py" if="$(var launch_driver)">
+
+    <!-- Include ZED with object detection launch file -->
+    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/zed_with_object_detection.launch.xml" if="$(var launch_driver)">
       <arg name="camera_name" value="$(var camera_model)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
-      <!-- Don't pass namespace arg, let push-ros-namespace handle it -->
+      <arg name="enable_zed_object_detection" value="$(var enable_zed_object_detection)"/>
+      <arg name="use_autoware_converter" value="$(var use_autoware_converter)"/>
       <arg name="container_name" value="/pointcloud_container"/>
     </include>
   </group>
