@@ -28,7 +28,7 @@
       <arg name="camera_model" value="$(var camera_model)"/>
       <arg name="enable_zed_object_detection" value="$(var enable_zed_object_detection)"/>
       <arg name="use_autoware_converter" value="$(var use_autoware_converter)"/>
-      <arg name="container_name" value="pointcloud_container"/>
+      <arg name="container_name" value="/pointcloud_container"/>
     </include>
   </group>
 
