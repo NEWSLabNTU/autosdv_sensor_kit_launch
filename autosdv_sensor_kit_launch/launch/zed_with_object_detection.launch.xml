@@ -5,7 +5,7 @@
   <arg name="camera_model" default="zedxm" description="Camera model (zed, zedm, zed2, zed2i, zedx, zedxm)"/>
   <arg name="enable_zed_object_detection" default="false" description="Enable ZED object detection"/>
   <arg name="use_autoware_converter" default="true" description="Convert ZED objects to Autoware format"/>
-  <arg name="container_name" default="/pointcloud_container" description="Container name for component loading"/>
+  <arg name="container_name" default="pointcloud_container" description="Container name for component loading (without leading slash)"/>
 
   <!-- Config file paths -->
   <let name="zed_config_file" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_object_detection.yaml"/>
