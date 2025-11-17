@@ -4,36 +4,112 @@
   <arg name="pointcloud_container_name" default="pointcloud_container"/>
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
 
-  <!-- Camera configuration arguments -->
-  <arg name="camera_model" default="zedxm" description="Camera model (zedxm, usb, or none)"/>
+  <!-- Sensor Suite Selection -->
+  <arg name="sensor_suite" default="custom" description="Predefined sensor suite: robin_zed, robin_zed_mpu, vlp32c_zed, vlp32c_zed_mpu, cube1_usb, custom"/>
 
-  <!-- GNSS configuration arguments -->
-  <arg name="gnss_receiver" default="garmin" description="GNSS receiver type (ublox, septentrio, or garmin)"/>
-  <arg name="use_gnss" default="true" description="Enable GNSS for outdoor operation"/>
+  <!-- Individual Sensor Configuration (can override suite defaults) -->
+  <arg name="lidar_model" default="" description="LiDAR model: robin-w, vlp32c, cube1 (empty = use suite default)"/>
+  <arg name="camera_model" default="" description="Camera model: zedxm, usb, none (empty = use suite default)"/>
+  <arg name="imu_source" default="" description="IMU source: mpu9250, zed (empty = use suite default)"/>
+  <arg name="gnss_receiver" default="" description="GNSS receiver: ublox, septentrio, garmin (empty = use suite default)"/>
+  <arg name="use_gnss" default="" description="Enable GNSS: true, false (empty = use suite default)"/>
+  <arg name="enable_zed_object_detection" default="" description="Enable ZED object detection: true, false (empty = use suite default)"/>
+
+  <!-- Sensor Suite Defaults -->
+  <!-- Suite: robin_zed - Robin-W LiDAR + ZED X Mini + ZED IMU (integrated) -->
+  <let name="suite_lidar_model" value="robin-w" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed'&quot;)"/>
+  <let name="suite_camera_model" value="zedxm" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed'&quot;)"/>
+  <let name="suite_imu_source" value="zed" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed'&quot;)"/>
+  <let name="suite_gnss_receiver" value="ublox" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed'&quot;)"/>
+  <let name="suite_use_gnss" value="true" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed'&quot;)"/>
+  <let name="suite_enable_zed_od" value="true" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed'&quot;)"/>
+
+  <!-- Suite: robin_zed_mpu - Robin-W LiDAR + ZED X Mini + MPU9250 -->
+  <let name="suite_lidar_model" value="robin-w" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed_mpu'&quot;)"/>
+  <let name="suite_camera_model" value="zedxm" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed_mpu'&quot;)"/>
+  <let name="suite_imu_source" value="mpu9250" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed_mpu'&quot;)"/>
+  <let name="suite_gnss_receiver" value="ublox" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed_mpu'&quot;)"/>
+  <let name="suite_use_gnss" value="true" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed_mpu'&quot;)"/>
+  <let name="suite_enable_zed_od" value="true" if="$(eval &quot;'$(var sensor_suite)'=='robin_zed_mpu'&quot;)"/>
+
+  <!-- Suite: vlp32c_zed - Velodyne VLP-32C + ZED X Mini + ZED IMU (integrated) -->
+  <let name="suite_lidar_model" value="vlp32c" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed'&quot;)"/>
+  <let name="suite_camera_model" value="zedxm" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed'&quot;)"/>
+  <let name="suite_imu_source" value="zed" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed'&quot;)"/>
+  <let name="suite_gnss_receiver" value="ublox" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed'&quot;)"/>
+  <let name="suite_use_gnss" value="true" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed'&quot;)"/>
+  <let name="suite_enable_zed_od" value="true" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed'&quot;)"/>
+
+  <!-- Suite: vlp32c_zed_mpu - Velodyne VLP-32C + ZED X Mini + MPU9250 -->
+  <let name="suite_lidar_model" value="vlp32c" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
+  <let name="suite_camera_model" value="zedxm" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
+  <let name="suite_imu_source" value="mpu9250" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
+  <let name="suite_gnss_receiver" value="ublox" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
+  <let name="suite_use_gnss" value="true" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
+  <let name="suite_enable_zed_od" value="true" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
+
+  <!-- Suite: cube1_usb - Cube1 LiDAR + USB Camera + MPU9250 -->
+  <let name="suite_lidar_model" value="cube1" if="$(eval &quot;'$(var sensor_suite)'=='cube1_usb'&quot;)"/>
+  <let name="suite_camera_model" value="usb" if="$(eval &quot;'$(var sensor_suite)'=='cube1_usb'&quot;)"/>
+  <let name="suite_imu_source" value="mpu9250" if="$(eval &quot;'$(var sensor_suite)'=='cube1_usb'&quot;)"/>
+  <let name="suite_gnss_receiver" value="ublox" if="$(eval &quot;'$(var sensor_suite)'=='cube1_usb'&quot;)"/>
+  <let name="suite_use_gnss" value="true" if="$(eval &quot;'$(var sensor_suite)'=='cube1_usb'&quot;)"/>
+  <let name="suite_enable_zed_od" value="false" if="$(eval &quot;'$(var sensor_suite)'=='cube1_usb'&quot;)"/>
+
+  <!-- Suite: custom - Manual configuration (backward compatible defaults) -->
+  <let name="suite_lidar_model" value="vlp32c" if="$(eval &quot;'$(var sensor_suite)'=='custom'&quot;)"/>
+  <let name="suite_camera_model" value="zedxm" if="$(eval &quot;'$(var sensor_suite)'=='custom'&quot;)"/>
+  <let name="suite_imu_source" value="mpu9250" if="$(eval &quot;'$(var sensor_suite)'=='custom'&quot;)"/>
+  <let name="suite_gnss_receiver" value="garmin" if="$(eval &quot;'$(var sensor_suite)'=='custom'&quot;)"/>
+  <let name="suite_use_gnss" value="true" if="$(eval &quot;'$(var sensor_suite)'=='custom'&quot;)"/>
+  <let name="suite_enable_zed_od" value="false" if="$(eval &quot;'$(var sensor_suite)'=='custom'&quot;)"/>
+
+  <!-- Apply defaults or use overrides -->
+  <let name="final_lidar_model" value="$(var lidar_model)" unless="$(eval &quot;'$(var lidar_model)'==''&quot;)"/>
+  <let name="final_lidar_model" value="$(var suite_lidar_model)" if="$(eval &quot;'$(var lidar_model)'==''&quot;)"/>
+
+  <let name="final_camera_model" value="$(var camera_model)" unless="$(eval &quot;'$(var camera_model)'==''&quot;)"/>
+  <let name="final_camera_model" value="$(var suite_camera_model)" if="$(eval &quot;'$(var camera_model)'==''&quot;)"/>
+
+  <let name="final_imu_source" value="$(var imu_source)" unless="$(eval &quot;'$(var imu_source)'==''&quot;)"/>
+  <let name="final_imu_source" value="$(var suite_imu_source)" if="$(eval &quot;'$(var imu_source)'==''&quot;)"/>
+
+  <let name="final_gnss_receiver" value="$(var gnss_receiver)" unless="$(eval &quot;'$(var gnss_receiver)'==''&quot;)"/>
+  <let name="final_gnss_receiver" value="$(var suite_gnss_receiver)" if="$(eval &quot;'$(var gnss_receiver)'==''&quot;)"/>
+
+  <let name="final_use_gnss" value="$(var use_gnss)" unless="$(eval &quot;'$(var use_gnss)'==''&quot;)"/>
+  <let name="final_use_gnss" value="$(var suite_use_gnss)" if="$(eval &quot;'$(var use_gnss)'==''&quot;)"/>
+
+  <let name="final_enable_zed_od" value="$(var enable_zed_object_detection)" unless="$(eval &quot;'$(var enable_zed_object_detection)'==''&quot;)"/>
+  <let name="final_enable_zed_od" value="$(var suite_enable_zed_od)" if="$(eval &quot;'$(var enable_zed_object_detection)'==''&quot;)"/>
 
   <group>
     <!-- LiDAR Driver -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/lidar.launch.xml">
       <arg name="launch_driver" value="$(var launch_driver)"/>
+      <arg name="lidar_model" value="$(var final_lidar_model)"/>
       <arg name="vehicle_mirror_param_file" value="$(var vehicle_mirror_param_file)"/>
       <arg name="pointcloud_container_name" value="$(var pointcloud_container_name)"/>
     </include>
 
     <!-- Camera Driver -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/camera.launch.xml">
-      <arg name="launch_driver" value="$(var launch_driver)" />
-      <arg name="camera_model" value="$(var camera_model)" />
+      <arg name="launch_driver" value="$(var launch_driver)"/>
+      <arg name="camera_model" value="$(var final_camera_model)"/>
+      <arg name="enable_zed_object_detection" value="$(var final_enable_zed_od)"/>
     </include>
 
     <!-- IMU Driver -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/imu.launch.xml">
       <arg name="launch_driver" value="$(var launch_driver)"/>
+      <arg name="imu_source" value="$(var final_imu_source)"/>
+      <arg name="camera_model" value="$(var final_camera_model)"/>
     </include>
 
     <!-- GNSS Driver -->
-    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/gnss.launch.xml" if="$(var use_gnss)">
+    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/gnss.launch.xml" if="$(eval &quot;'$(var final_use_gnss)'=='true'&quot;)">
       <arg name="launch_driver" value="$(var launch_driver)"/>
-      <arg name="gnss_receiver" value="$(var gnss_receiver)"/>
+      <arg name="gnss_receiver" value="$(var final_gnss_receiver)"/>
     </include>
 
     <!-- Vehicle Velocity Converter  -->
