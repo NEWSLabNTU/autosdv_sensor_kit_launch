@@ -16,6 +16,8 @@
       <arg name="camera_name" value="$(var camera_name)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
       <arg name="container_name" value="$(var container_name)"/>
+      <arg name="publish_tf" value="true"/>
+      <arg name="publish_imu_tf" value="true"/>
       <arg name="ros_params_override_path" value="$(var zed_config_file)"/>
     </include>
   </group>
@@ -24,6 +26,8 @@
       <arg name="camera_name" value="$(var camera_name)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
       <arg name="container_name" value="$(var container_name)"/>
+      <arg name="publish_tf" value="true"/>
+      <arg name="publish_imu_tf" value="true"/>
     </include>
   </group>
 

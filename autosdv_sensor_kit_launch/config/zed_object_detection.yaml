@@ -39,6 +39,10 @@
       debug_object_detection: false
       debug_body_tracking: false
 
+    # Sensors settings
+    sensors:
+      publish_imu_tf: true  # Enable IMU TF frame broadcasting
+
     # General settings (keep existing ZED settings)
     general:
       camera_model: 'zedxm'
