@@ -1,15 +1,21 @@
 <launch>
   <arg name="launch_driver" default="true"/>
+  <arg name="imu_source" default="mpu9250" description="IMU source: mpu9250 (external I2C IMU) or zed (ZED camera built-in IMU)"/>
+  <arg name="camera_model" default="zedxm" description="Camera model for ZED IMU (zed, zedm, zed2, zed2i, zedx, zedxm)"/>
 
   <arg name="navsatfix_topic_name" default="mti/fix"/>
   <arg name="orientation_topic_name" default="/autoware_orientation"/>
   <group>
     <push-ros-namespace namespace="imu"/>
 
-    <arg name="imu_raw_name" default="mpu9250/imu_raw"/>
     <arg name="imu_corrector_param_file" default="$(find-pkg-share individual_params)/config/$(var vehicle_id)/autosdv_sensor_kit/imu_corrector.param.yaml"/>
 
-    <group>
+    <!-- Set IMU raw topic name based on source -->
+    <let name="imu_raw_topic" value="mpu9250/imu_raw" if="$(eval &quot;'$(var imu_source)'=='mpu9250'&quot;)"/>
+    <let name="imu_raw_topic" value="/sensing/camera/$(var camera_model)/zed_node/imu/data_raw" if="$(eval &quot;'$(var imu_source)'=='zed'&quot;)"/>
+
+    <!-- MPU9250 IMU Driver -->
+    <group if="$(eval &quot;'$(var imu_source)'=='mpu9250'&quot;)">
       <push-ros-namespace namespace="mpu9250"/>
       <node pkg="mpu9250driver" exec="mpu9250driver" name="mpu9250driver_node" output="screen" if="$(var launch_driver)">
         <remap from="imu" to="imu_raw"/>
@@ -17,14 +23,30 @@
       </node>
     </group>
 
+    <!-- ZED IMU Source (only launch if camera is NOT using ZED) -->
+    <group if="$(eval &quot;'$(var imu_source)'=='zed' and '$(var camera_model)'!='zedxm'&quot;)">
+      <!-- Launch standalone minimal ZED camera for IMU only -->
+      <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py" if="$(var launch_driver)">
+        <arg name="camera_name" value="zedxm"/>
+        <arg name="camera_model" value="zedxm"/>
+        <arg name="publish_urdf" value="false"/>
+        <arg name="publish_tf" value="true"/>
+        <arg name="publish_map_tf" value="false"/>
+        <arg name="publish_imu_tf" value="true"/>
+        <arg name="ros_params_override_path" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_imu_minimal.yaml"/>
+      </include>
+    </group>
+
+    <!-- IMU Corrector - reads from appropriate source based on imu_raw_topic -->
     <include file="$(find-pkg-share autoware_imu_corrector)/launch/imu_corrector.launch.xml">
-      <arg name="input_topic" value="$(var imu_raw_name)"/>
+      <arg name="input_topic" value="$(var imu_raw_topic)"/>
       <arg name="output_topic" value="imu_data"/>
       <arg name="param_file" value="$(var imu_corrector_param_file)"/>
     </include>
 
+    <!-- Gyro Bias Estimator - reads from appropriate source based on imu_raw_topic -->
     <include file="$(find-pkg-share autoware_imu_corrector)/launch/gyro_bias_estimator.launch.xml">
-      <arg name="input_imu_raw" value="$(var imu_raw_name)"/>
+      <arg name="input_imu_raw" value="$(var imu_raw_topic)"/>
       <arg name="input_odom" value="/localization/kinematic_state"/>
       <arg name="imu_corrector_param_file" value="$(var imu_corrector_param_file)"/>
     </include>

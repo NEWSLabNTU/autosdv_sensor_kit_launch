@@ -1,0 +1,64 @@
+/**:
+  ros__parameters:
+    # Minimal ZED Configuration for IMU-only operation
+    # All expensive features disabled for lightweight IMU data collection
+
+    # General settings
+    general:
+      grab_resolution: 'HD720'  # Lowest resolution to minimize processing
+      grab_frame_rate: 15  # Minimum frame rate
+      pub_resolution: 'CUSTOM'  # Don't publish images
+      pub_frame_rate: 1.0  # Minimal image publishing (if any)
+      gpu_id: -1  # Auto-select GPU
+
+    # Video settings - disable image publishing
+    video:
+      img_downsample_factor: 1.0
+      extrinsic_in_camera_frame: false
+
+    # Depth settings - DISABLE depth computation
+    depth:
+      depth_mode: 'NONE'  # Disable depth computation
+      depth_stabilization: 0
+      openni_depth_mode: false
+      point_cloud_freq: 0.0  # Disable point cloud
+
+    # Point cloud - DISABLE
+    point_cloud:
+      point_cloud_enabled: false  # Disable point cloud
+
+    # Positional tracking - DISABLE
+    pos_tracking:
+      pos_tracking_enabled: false  # Disable SLAM/tracking
+      publish_tf: false
+      publish_map_tf: false
+      map_frame: 'map'
+      odometry_frame: 'odom'
+
+    # Mapping - DISABLE
+    mapping:
+      mapping_enabled: false  # Disable 3D mapping
+
+    # Object Detection - DISABLE
+    object_detection:
+      od_enabled: false  # Disable object detection
+
+    # Body Tracking - DISABLE
+    body_tracking:
+      bt_enabled: false  # Disable body tracking
+
+    # Sensors - ENABLE IMU only
+    sensors:
+      sensors_image_sync: false
+      sensors_pub_rate: 100.0  # 100 Hz IMU publishing (default)
+      publish_imu_tf: true  # Enable IMU TF frame broadcasting (required for imu_corrector)
+
+    # Advanced settings
+    advanced:
+      thread_sched_policy: 'SCHED_BATCH'  # Low priority scheduling
+
+    # Debug - disable all debug features
+    debug:
+      debug_common: false
+      debug_video_depth: false
+      debug_sensors: false
