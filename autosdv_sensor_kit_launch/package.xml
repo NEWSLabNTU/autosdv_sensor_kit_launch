@@ -15,6 +15,9 @@
   <exec_depend>tamagawa_imu_driver</exec_depend>
   <exec_depend>topic_tools</exec_depend>
   <exec_depend>ublox_gps</exec_depend>
+  <exec_depend>ntrip_client</exec_depend>
+  <exec_depend>rtcm_msgs</exec_depend>
+  <exec_depend>nmea_msgs</exec_depend>
   <exec_depend>usb_cam</exec_depend>
   <exec_depend>nmea_navsat_driver</exec_depend>
   <exec_depend>seyond</exec_depend>

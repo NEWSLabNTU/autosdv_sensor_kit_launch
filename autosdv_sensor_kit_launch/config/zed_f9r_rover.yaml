@@ -1,0 +1,78 @@
+# Configuration Settings for u-blox ZED-F9R device in Rover mode
+# This configuration is for RTK positioning with NTRIP corrections
+# Hardware: SimpleRTK2B Fusion board with ZED-F9R module
+
+ublox_gps_node:
+  ros__parameters:
+    debug: 1                    # Range 0-4 (0 means no debug statements will print)
+
+    # Device Configuration
+    device: /dev/ublox-gps      # Symlink created by udev rules
+    frame_id: gnss_link
+
+    # Save Configuration
+    save:
+      mask: 3103                # Save I/O, Message, INF Message, Nav, Receiver
+                                # Manager, Antenna, and Logging Configuration
+      device: 4                 # Save to EEPROM
+
+    # Dynamic Model - optimized for ground vehicles
+    dynamic_model: automotive   # Ground vehicle model
+                                # Max Horizontal Velocity: 84 m/s
+                                # Max Vertical Velocity: 15 m/s
+                                # Optimized for cars/trucks
+
+    fix_mode: auto              # Auto 2D/3D fix mode
+    dr_limit: 0                 # Dead reckoning limit (0 = disabled)
+    enable_ppp: false           # PPP not needed with RTK
+
+    # Measurement Rate
+    rate: 10.0                  # Measurement rate in Hz (F9R supports up to 25 Hz)
+    nav_rate: 1                 # Navigation rate in number of measurement cycles
+
+    # UART1 Configuration for RTCM input
+    uart1:
+      baudrate: 115200          # High baud rate for F9R
+      in: 32                    # RTCM 3 input enabled
+      out: 1                    # UBX output enabled
+
+    # TMODE3 Config - Rover Mode
+    tmode3: 0                   # Disabled (rover mode, not base station)
+    sv_in:
+      reset: false              # No survey-in for rover
+      min_dur: 300              # Not used in rover mode
+      acc_lim: 3.0              # Not used in rover mode
+
+    # GNSS Constellation Configuration
+    gnss:
+      glonass: true             # GLONASS supported by F9R
+      beidou: true              # BeiDou supported by F9R
+      galileo: true             # Galileo supported by F9R
+      qzss: true                # QZSS supported by F9R
+      sbas: true                # SBAS (WAAS/EGNOS/MSAS) supported
+
+    # DGNSS Mode for RTK
+    dgnss_mode: 3               # Fixed mode RTK
+
+    # Information Messages
+    inf:
+      all: true                 # Display all INF messages in console
+
+    # Enable u-blox message publishers
+    publish:
+      all: true
+      aid:
+        hui: false
+      nav:
+        posecef: false
+        clock: true
+        posllh: true
+        pvt: true
+        relposned: true         # Relative positioning for RTK
+        sat: true               # Satellite information
+        status: true
+        velned: true
+      rxm:
+        rtcm: true              # RTCM reception status
+        rawx: false             # Raw measurements (disable to reduce bandwidth)
+        sfrbx: false            # Subframe buffer (disable to reduce bandwidth)

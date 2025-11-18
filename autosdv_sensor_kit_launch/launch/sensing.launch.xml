@@ -13,6 +13,7 @@
   <arg name="imu_source" default="" description="IMU source: mpu9250, zed (empty = use suite default)"/>
   <arg name="gnss_receiver" default="" description="GNSS receiver: ublox, septentrio, garmin (empty = use suite default)"/>
   <arg name="use_gnss" default="" description="Enable GNSS: true, false (empty = use suite default)"/>
+  <arg name="use_ntrip" default="false" description="Enable NTRIP client for RTK corrections (ublox only)"/>
   <arg name="enable_zed_object_detection" default="" description="Enable ZED object detection: true, false (empty = use suite default)"/>
 
   <!-- Sensor Suite Defaults -->
@@ -110,6 +111,7 @@
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/gnss.launch.xml" if="$(eval &quot;'$(var final_use_gnss)'=='true'&quot;)">
       <arg name="launch_driver" value="$(var launch_driver)"/>
       <arg name="gnss_receiver" value="$(var final_gnss_receiver)"/>
+      <arg name="use_ntrip" value="$(var use_ntrip)"/>
     </include>
 
     <!-- Vehicle Velocity Converter  -->

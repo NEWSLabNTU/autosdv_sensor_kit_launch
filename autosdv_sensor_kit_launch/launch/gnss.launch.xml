@@ -1,6 +1,7 @@
 <launch>
   <arg name="launch_driver" default="true"/>
   <arg name="gnss_receiver" default="garmin" description="ublox(default) or septentrio"/>
+  <arg name="use_ntrip" default="false" description="Enable NTRIP client for RTK corrections (ublox only)"/>
 
   <group>
     <push-ros-namespace namespace="gnss"/>
@@ -16,8 +17,14 @@
       <push-ros-namespace namespace="ublox"/>
       <node pkg="ublox_gps" name="ublox" exec="ublox_gps_node" if="$(var launch_driver)" respawn="true" respawn_delay="1.0">
         <remap from="fix" to="nav_sat_fix"/>
-        <param from="$(find-pkg-share individual_params)/config/default/ublox_gps/c94_f9p_rover.yaml"/>
+        <!-- Remap RTCM topic to receive corrections from NTRIP client -->
+        <remap from="rtcm" to="/sensing/gnss/ntrip/rtcm"/>
+        <!-- Use ZED-F9R rover configuration -->
+        <param from="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_f9r_rover.yaml"/>
       </node>
+
+      <!-- NTRIP Client for RTK Corrections (optional) -->
+      <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/ntrip.launch.xml" if="$(var use_ntrip)"/>
     </group>
 
     <!-- Septentrio GNSS Driver -->

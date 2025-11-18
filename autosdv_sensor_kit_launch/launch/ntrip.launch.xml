@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+  NTRIP Client Launch File
+
+  Connects to NTRIP caster to receive RTCM corrections for RTK positioning.
+  Configured for e-GNSS Taiwan VRS (Virtual Reference Station) by default.
+
+  Topics:
+    - Subscribe: /sensing/gnss/ublox/nmea_sentence (from GPS driver)
+    - Publish: /sensing/gnss/ntrip/rtcm (to GPS driver)
+-->
+<launch>
+  <!-- NTRIP Configuration Arguments -->
+  <arg name="host" default="210.241.63.193" description="NTRIP caster hostname or IP"/>
+  <arg name="port" default="81" description="NTRIP caster port"/>
+  <arg name="mountpoint" default="Taiwan" description="NTRIP mountpoint"/>
+  <arg name="authenticate" default="true" description="Enable authentication"/>
+  <arg name="username" default="FIXME" description="NTRIP username"/>
+  <arg name="password" default="FIXME" description="NTRIP password"/>
+  <arg name="rtcm_frame_id" default="gnss_link" description="Frame ID for RTCM messages"/>
+
+  <!-- NTRIP Client Node -->
+  <node pkg="ntrip_client" exec="ntrip_ros.py" name="ntrip_client" namespace="sensing/gnss/ntrip" output="screen" respawn="true" respawn_delay="5.0">
+    <!-- Connection Parameters -->
+    <param name="host" value="$(var host)"/>
+    <param name="port" value="$(var port)"/>
+    <param name="mountpoint" value="$(var mountpoint)"/>
+
+    <!-- Authentication -->
+    <param name="authenticate" value="$(var authenticate)"/>
+    <param name="username" value="$(var username)"/>
+    <param name="password" value="$(var password)"/>
+
+    <!-- Message Configuration -->
+    <param name="rtcm_frame_id" value="$(var rtcm_frame_id)"/>
+    <param name="rtcm_message_package" value="rtcm_msgs"/>
+
+    <!-- Topic Remapping -->
+    <!-- Subscribe to NMEA from GPS driver -->
+    <remap from="nmea" to="/sensing/gnss/ublox/nmea_sentence"/>
+    <!-- Publish RTCM corrections -->
+    <remap from="rtcm" to="/sensing/gnss/ntrip/rtcm"/>
+  </node>
+</launch>
