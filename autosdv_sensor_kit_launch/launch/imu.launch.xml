@@ -12,7 +12,7 @@
 
     <!-- Set IMU raw topic name based on source -->
     <let name="imu_raw_topic" value="mpu9250/imu_raw" if="$(eval &quot;'$(var imu_source)'=='mpu9250'&quot;)"/>
-    <let name="imu_raw_topic" value="/sensing/camera/$(var camera_model)/zed_node/imu/data_raw" if="$(eval &quot;'$(var imu_source)'=='zed'&quot;)"/>
+    <let name="imu_raw_topic" value="/sensing/camera/$(var camera_model)/$(var camera_model)/imu/data_raw" if="$(eval &quot;'$(var imu_source)'=='zed'&quot;)"/>
 
     <!-- MPU9250 IMU Driver -->
     <group if="$(eval &quot;'$(var imu_source)'=='mpu9250'&quot;)">
