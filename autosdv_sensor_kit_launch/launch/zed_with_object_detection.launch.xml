@@ -5,17 +5,32 @@
   <arg name="camera_model" default="zedxm" description="Camera model (zed, zedm, zed2, zed2i, zedx, zedxm)"/>
   <arg name="enable_zed_object_detection" default="false" description="Enable ZED object detection"/>
   <arg name="use_autoware_converter" default="true" description="Convert ZED objects to Autoware format"/>
-  <arg name="container_name" default="pointcloud_container" description="Container name for component loading (without leading slash)"/>
 
   <!-- Config file paths -->
   <let name="zed_config_file" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_object_detection.yaml"/>
 
+  <!--
+    Create standalone ZED container explicitly.
+    We create the container here instead of letting zed_camera.launch.py create it,
+    because the ZED wrapper has a bug where it doesn't account for parent namespace
+    when constructing the container path for LoadComposableNodes.
+
+    By creating the container here and passing its absolute path, we avoid the mismatch.
+  -->
+  <node_container pkg="rclcpp_components" exec="component_container_isolated" name="zed_container" namespace="camera/$(var camera_name)">
+    <param name="use_multi_threaded_executor" value="true"/>
+  </node_container>
+
   <!-- Launch ZED camera with appropriate configuration -->
+  <!-- Pass absolute container path to avoid namespace mismatch bug in ZED wrapper -->
+  <!-- Note: ZED wrapper overrides node_name with camera_name when namespace is specified -->
+  <!-- Topics will be: /sensing/camera/<camera_name>/<camera_name>/<topic> -->
   <group if="$(var enable_zed_object_detection)">
     <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py">
       <arg name="camera_name" value="$(var camera_name)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
-      <arg name="container_name" value="$(var container_name)"/>
+      <arg name="namespace" value="camera/$(var camera_name)"/>
+      <arg name="container_name" value="/sensing/camera/$(var camera_name)/zed_container"/>
       <arg name="publish_tf" value="true"/>
       <arg name="publish_imu_tf" value="true"/>
       <arg name="ros_params_override_path" value="$(var zed_config_file)"/>
@@ -25,7 +40,8 @@
     <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py">
       <arg name="camera_name" value="$(var camera_name)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
-      <arg name="container_name" value="$(var container_name)"/>
+      <arg name="namespace" value="camera/$(var camera_name)"/>
+      <arg name="container_name" value="/sensing/camera/$(var camera_name)/zed_container"/>
       <arg name="publish_tf" value="true"/>
       <arg name="publish_imu_tf" value="true"/>
     </include>
@@ -38,7 +54,8 @@
   <group if="$(eval &quot;'$(var enable_zed_object_detection)'=='true' and '$(var use_autoware_converter)'=='true'&quot;)">
     <include file="$(find-pkg-share autoware_zed_converter)/launch/converter_node.launch.xml">
       <arg name="node_name" value="zed_object_converter"/>
-      <arg name="input_topic" value="/sensing/camera/$(var camera_name)/zed_node/obj_det/objects"/>
+      <!-- Note: ZED wrapper uses camera_name as node_name when namespace is specified -->
+      <arg name="input_topic" value="/sensing/camera/$(var camera_name)/$(var camera_name)/obj_det/objects"/>
       <arg name="output_topic" value="/perception/object_recognition/detection/camera_objects"/>
       <arg name="use_tracking_velocity" value="true"/>
       <arg name="existence_probability_threshold" value="0.4"/>

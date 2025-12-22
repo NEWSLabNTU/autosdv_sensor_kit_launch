@@ -18,17 +18,13 @@
   <arg name="right_camera_device" default="/dev/video3"/>
 
   <!-- ZED Camera Group -->
+  <!-- ZED launch creates its own container and handles namespace internally -->
   <group if="$(eval &quot;'$(var camera_model)'=='zedxm'&quot;)">
-    <!-- Load ZED into shared pointcloud_container for zero-copy benefit -->
-    <push-ros-namespace namespace="camera"/>
-
-    <!-- Include ZED with object detection launch file -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/zed_with_object_detection.launch.xml" if="$(var launch_driver)">
       <arg name="camera_name" value="$(var camera_model)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
       <arg name="enable_zed_object_detection" value="$(var enable_zed_object_detection)"/>
       <arg name="use_autoware_converter" value="$(var use_autoware_converter)"/>
-      <arg name="container_name" value="/pointcloud_container"/>
     </include>
   </group>
 
