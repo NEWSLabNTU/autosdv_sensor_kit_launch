@@ -1,64 +1,69 @@
 /**:
   ros__parameters:
-    # Minimal ZED Configuration for IMU-only operation
-    # All expensive features disabled for lightweight IMU data collection
+    # Minimal ZED Configuration for IMU-only operation (ZED 5.1.0)
+    # All camera streams and expensive features disabled for lightweight IMU data collection
 
-    # General settings
+    # General settings - minimal processing
     general:
-      grab_resolution: 'HD720'  # Lowest resolution to minimize processing
-      grab_frame_rate: 15  # Minimum frame rate
-      pub_resolution: 'CUSTOM'  # Don't publish images
-      pub_frame_rate: 1.0  # Minimal image publishing (if any)
-      gpu_id: -1  # Auto-select GPU
+      pub_resolution: 'CUSTOM'
+      pub_downscale_factor: 4.0
+      pub_frame_rate: 1.0
 
-    # Video settings - disable image publishing
+    # Video settings - DISABLE all image publishing
     video:
-      img_downsample_factor: 1.0
-      extrinsic_in_camera_frame: false
+      publish_rgb: false
+      publish_left_right: false
+      publish_raw: false
+      publish_gray: false
+      publish_stereo: false
 
     # Depth settings - DISABLE depth computation
     depth:
-      depth_mode: 'NONE'  # Disable depth computation
+      depth_mode: 'NONE'
       depth_stabilization: 0
-      openni_depth_mode: false
-      point_cloud_freq: 0.0  # Disable point cloud
-
-    # Point cloud - DISABLE
-    point_cloud:
-      point_cloud_enabled: false  # Disable point cloud
+      point_cloud_freq: 0.0
+      publish_depth_map: false
+      publish_depth_info: false
+      publish_point_cloud: false
+      publish_depth_confidence: false
+      publish_disparity: false
 
     # Positional tracking - DISABLE
     pos_tracking:
-      pos_tracking_enabled: false  # Disable SLAM/tracking
+      pos_tracking_enabled: false
       publish_tf: false
       publish_map_tf: false
-      map_frame: 'map'
-      odometry_frame: 'odom'
 
     # Mapping - DISABLE
     mapping:
-      mapping_enabled: false  # Disable 3D mapping
+      mapping_enabled: false
 
     # Object Detection - DISABLE
     object_detection:
-      od_enabled: false  # Disable object detection
+      od_enabled: false
 
     # Body Tracking - DISABLE
     body_tracking:
-      bt_enabled: false  # Disable body tracking
+      bt_enabled: false
 
     # Sensors - ENABLE IMU only
     sensors:
       sensors_image_sync: false
-      sensors_pub_rate: 100.0  # 100 Hz IMU publishing (default)
-      publish_imu_tf: true  # Enable IMU TF frame broadcasting (required for imu_corrector)
+      sensors_pub_rate: 100.0
+      publish_imu: true
+      publish_imu_tf: true
+      publish_imu_raw: false
+      publish_mag: false
+      publish_baro: false
+      publish_temp: false
 
-    # Advanced settings
+    # Advanced settings - low priority
     advanced:
-      thread_sched_policy: 'SCHED_BATCH'  # Low priority scheduling
+      thread_sched_policy: 'SCHED_BATCH'
 
-    # Debug - disable all debug features
+    # Debug - disable all
     debug:
+      sdk_verbose: 0
       debug_common: false
       debug_video_depth: false
       debug_sensors: false

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<launch>
+  <!--
+    Minimal ZED Camera Launch for IMU-only operation.
+
+    Uses direct XML composable node loading to avoid Python launch namespace issues.
+    All camera streams are disabled - only IMU data is published.
+
+    Output topics:
+    - /sensing/camera/zedxm/imu/data (sensor_msgs/Imu)
+  -->
+
+  <!-- Launch arguments -->
+  <arg name="camera_name" default="zedxm" description="Camera name"/>
+  <arg name="camera_model" default="zedxm" description="Camera model"/>
+
+  <!-- Config file paths -->
+  <let name="zed_common_config" value="$(find-pkg-share zed_wrapper)/config/common_stereo.yaml"/>
+  <let name="zed_camera_config" value="$(find-pkg-share zed_wrapper)/config/$(var camera_model).yaml"/>
+  <let name="zed_imu_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_imu_minimal.yaml"/>
+
+  <!-- Create ZED container with ABSOLUTE namespace -->
+  <node_container pkg="rclcpp_components" exec="component_container_isolated"
+                  name="zed_container" namespace="/sensing/camera/$(var camera_name)">
+    <param name="use_multi_threaded_executor" value="true"/>
+  </node_container>
+
+  <!-- Load ZED composable node with minimal config (IMU only) -->
+  <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
+    <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
+                     name="$(var camera_name)" namespace="camera">
+      <param from="$(var zed_common_config)"/>
+      <param from="$(var zed_camera_config)"/>
+      <param from="$(var zed_imu_config)"/>
+      <param name="general.camera_name" value="$(var camera_name)"/>
+      <param name="general.camera_model" value="$(var camera_model)"/>
+      <!-- Disable TF publishing - minimal mode -->
+      <param name="pos_tracking.publish_tf" value="false"/>
+      <param name="pos_tracking.publish_map_tf" value="false"/>
+      <!-- Enable IMU TF for imu_corrector -->
+      <param name="sensors.publish_imu_tf" value="true"/>
+      <extra_arg name="use_intra_process_comms" value="true"/>
+    </composable_node>
+  </load_composable_node>
+
+  <!-- Robot State Publisher for ZED URDF/TF (needed for IMU frame) -->
+  <node pkg="robot_state_publisher" exec="robot_state_publisher"
+        name="$(var camera_name)_state_publisher" namespace="/sensing/camera/$(var camera_name)">
+    <param name="robot_description"
+           value="$(command 'xacro $(find-pkg-share zed_wrapper)/urdf/zed_descr.urdf.xacro camera_name:=$(var camera_name) camera_model:=$(var camera_model)')"/>
+    <remap from="robot_description" to="$(var camera_name)_description"/>
+  </node>
+</launch>

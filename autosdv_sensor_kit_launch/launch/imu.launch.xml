@@ -5,6 +5,17 @@
 
   <arg name="navsatfix_topic_name" default="mti/fix"/>
   <arg name="orientation_topic_name" default="/autoware_orientation"/>
+
+  <!-- ZED IMU Source: Launch minimal ZED camera OUTSIDE the imu namespace -->
+  <!-- Only launch if camera_model is NOT zedxm (i.e., camera.launch.xml is not launching ZED) -->
+  <group if="$(eval &quot;'$(var imu_source)'=='zed' and '$(var camera_model)'!='zedxm'&quot;)">
+    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/zed_imu_only.launch.xml" if="$(var launch_driver)">
+      <arg name="camera_name" value="zedxm"/>
+      <arg name="camera_model" value="zedxm"/>
+    </include>
+  </group>
+
+  <!-- IMU processing nodes under /sensing/imu namespace -->
   <group>
     <push-ros-namespace namespace="imu"/>
 
@@ -12,8 +23,8 @@
 
     <!-- Set IMU raw topic name based on source -->
     <let name="imu_raw_topic" value="mpu9250/imu_raw" if="$(eval &quot;'$(var imu_source)'=='mpu9250'&quot;)"/>
-    <!-- ZED IMU topic: /sensing/camera/<camera_name>/imu/data (ZED 5.1.0) -->
-    <let name="imu_raw_topic" value="/sensing/camera/$(var camera_model)/imu/data" if="$(eval &quot;'$(var imu_source)'=='zed'&quot;)"/>
+    <!-- ZED IMU topic: /sensing/camera/zedxm/imu/data (ZED 5.1.0) -->
+    <let name="imu_raw_topic" value="/sensing/camera/zedxm/imu/data" if="$(eval &quot;'$(var imu_source)'=='zed'&quot;)"/>
 
     <!-- MPU9250 IMU Driver -->
     <group if="$(eval &quot;'$(var imu_source)'=='mpu9250'&quot;)">
@@ -22,20 +33,6 @@
         <remap from="imu" to="imu_raw"/>
         <param from="$(find-pkg-share mpu9250driver)/params/mpu9250.yaml"/>
       </node>
-    </group>
-
-    <!-- ZED IMU Source (only launch if camera is NOT using ZED) -->
-    <group if="$(eval &quot;'$(var imu_source)'=='zed' and '$(var camera_model)'!='zedxm'&quot;)">
-      <!-- Launch standalone minimal ZED camera for IMU only -->
-      <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py" if="$(var launch_driver)">
-        <arg name="camera_name" value="zedxm"/>
-        <arg name="camera_model" value="zedxm"/>
-        <arg name="publish_urdf" value="false"/>
-        <arg name="publish_tf" value="true"/>
-        <arg name="publish_map_tf" value="false"/>
-        <arg name="publish_imu_tf" value="true"/>
-        <arg name="ros_params_override_path" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_imu_minimal.yaml"/>
-      </include>
     </group>
 
     <!-- IMU Corrector - reads from appropriate source based on imu_raw_topic -->

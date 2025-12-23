@@ -5,7 +5,7 @@
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
 
   <!-- Sensor Suite Selection -->
-  <arg name="sensor_suite" default="custom" description="Predefined sensor suite: robin_zed, robin_zed_mpu, vlp32c_zed, vlp32c_zed_mpu, cube1_usb, custom"/>
+  <arg name="sensor_suite" default="custom" description="Predefined sensor suite: robin_zed, robin_zed_mpu, vlp32c_zed, vlp32c_zed_mpu, vlp32c_zed_imu, cube1_usb, custom"/>
 
   <!-- Individual Sensor Configuration (can override suite defaults) -->
   <arg name="lidar_model" default="" description="LiDAR model: robin-w, vlp32c, cube1 (empty = use suite default)"/>
@@ -49,6 +49,14 @@
   <let name="suite_gnss_receiver" value="ublox" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
   <let name="suite_use_gnss" value="true" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
   <let name="suite_enable_zed_od" value="true" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_mpu'&quot;)"/>
+
+  <!-- Suite: vlp32c_zed_imu - Velodyne VLP-32C + ZED IMU only (no camera streams) -->
+  <let name="suite_lidar_model" value="vlp32c" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_imu'&quot;)"/>
+  <let name="suite_camera_model" value="none" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_imu'&quot;)"/>
+  <let name="suite_imu_source" value="zed" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_imu'&quot;)"/>
+  <let name="suite_gnss_receiver" value="ublox" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_imu'&quot;)"/>
+  <let name="suite_use_gnss" value="true" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_imu'&quot;)"/>
+  <let name="suite_enable_zed_od" value="false" if="$(eval &quot;'$(var sensor_suite)'=='vlp32c_zed_imu'&quot;)"/>
 
   <!-- Suite: cube1_usb - Cube1 LiDAR + USB Camera + MPU9250 -->
   <let name="suite_lidar_model" value="cube1" if="$(eval &quot;'$(var sensor_suite)'=='cube1_usb'&quot;)"/>
