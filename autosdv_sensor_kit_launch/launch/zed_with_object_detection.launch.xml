@@ -4,58 +4,135 @@
   <arg name="camera_name" default="zedxm" description="Camera name"/>
   <arg name="camera_model" default="zedxm" description="Camera model (zed, zedm, zed2, zed2i, zedx, zedxm)"/>
   <arg name="enable_zed_object_detection" default="false" description="Enable ZED object detection"/>
+  <arg name="enable_stereo_output" default="false" description="Enable left/right stereo output (for Isaac SLAM)"/>
   <arg name="use_autoware_converter" default="true" description="Convert ZED objects to Autoware format"/>
+  <arg name="publish_tf" default="true" description="Publish TF"/>
+  <arg name="publish_imu_tf" default="true" description="Publish IMU TF"/>
 
-  <!-- Config file paths -->
-  <let name="zed_config_file" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_object_detection.yaml"/>
+  <!-- Config file paths from zed_wrapper package -->
+  <let name="zed_common_config" value="$(find-pkg-share zed_wrapper)/config/common_stereo.yaml"/>
+  <let name="zed_camera_config" value="$(find-pkg-share zed_wrapper)/config/$(var camera_model).yaml"/>
+  <let name="zed_od_config" value="$(find-pkg-share zed_wrapper)/config/object_detection.yaml"/>
+  <let name="zed_custom_od_config" value="$(find-pkg-share zed_wrapper)/config/custom_object_detection.yaml"/>
+  <let name="autosdv_zed_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_object_detection.yaml"/>
+  <let name="autosdv_isaac_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_isaac_slam.yaml"/>
 
   <!--
-    Create standalone ZED container explicitly.
-    We create the container here instead of letting zed_camera.launch.py create it,
-    because the ZED wrapper has a bug where it doesn't account for parent namespace
-    when constructing the container path for LoadComposableNodes.
+    ZED Camera Launch using direct XML composable node loading.
 
-    By creating the container here and passing its absolute path, we avoid the mismatch.
+    This bypasses the Python launch file (zed_camera.launch.py) which does NOT respect
+    XML push-ros-namespace directives. By loading the composable node directly via XML,
+    we have full control over the namespace.
+
+    Container: /sensing/camera/<camera_name>/zed_container (absolute namespace)
+    ZED Node: /sensing/camera/<camera_name>/<camera_name> (relative to container)
   -->
-  <node_container pkg="rclcpp_components" exec="component_container_isolated" name="zed_container" namespace="camera/$(var camera_name)">
+
+  <!-- Create ZED container with ABSOLUTE namespace -->
+  <node_container pkg="rclcpp_components" exec="component_container_isolated"
+                  name="zed_container" namespace="/sensing/camera/$(var camera_name)">
     <param name="use_multi_threaded_executor" value="true"/>
   </node_container>
 
-  <!-- Launch ZED camera with appropriate configuration -->
-  <!-- Pass absolute container path to avoid namespace mismatch bug in ZED wrapper -->
-  <!-- Note: ZED wrapper overrides node_name with camera_name when namespace is specified -->
-  <!-- Topics will be: /sensing/camera/<camera_name>/<camera_name>/<topic> -->
-  <group if="$(var enable_zed_object_detection)">
-    <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py">
-      <arg name="camera_name" value="$(var camera_name)"/>
-      <arg name="camera_model" value="$(var camera_model)"/>
-      <arg name="namespace" value="camera/$(var camera_name)"/>
-      <arg name="container_name" value="/sensing/camera/$(var camera_name)/zed_container"/>
-      <arg name="publish_tf" value="true"/>
-      <arg name="publish_imu_tf" value="true"/>
-      <arg name="ros_params_override_path" value="$(var zed_config_file)"/>
-    </include>
-  </group>
-  <group unless="$(var enable_zed_object_detection)">
-    <include file="$(find-pkg-share zed_wrapper)/launch/zed_camera.launch.py">
-      <arg name="camera_name" value="$(var camera_name)"/>
-      <arg name="camera_model" value="$(var camera_model)"/>
-      <arg name="namespace" value="camera/$(var camera_name)"/>
-      <arg name="container_name" value="/sensing/camera/$(var camera_name)/zed_container"/>
-      <arg name="publish_tf" value="true"/>
-      <arg name="publish_imu_tf" value="true"/>
-    </include>
+  <!--
+    Load ZED composable node directly (bypasses Python launch namespace issues).
+
+    The composable node namespace is relative to parent XML push-ros-namespace context (/sensing).
+    Using namespace="camera" with node name "<camera_name>" results in:
+    - Node: /sensing/camera/<camera_name>
+    - Topics: /sensing/camera/<camera_name>/<topic>
+
+    This provides clean topic paths without extra node name nesting.
+  -->
+  <!-- Case 1: Basic mode (no object detection, no stereo output) -->
+  <group if="$(eval &quot;'$(var enable_zed_object_detection)'!='true' and '$(var enable_stereo_output)'!='true'&quot;)">
+    <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
+      <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
+                       name="$(var camera_name)" namespace="camera">
+        <param from="$(var zed_common_config)"/>
+        <param from="$(var zed_camera_config)"/>
+        <param from="$(var zed_od_config)"/>
+        <param from="$(var zed_custom_od_config)"/>
+        <param name="general.camera_name" value="$(var camera_name)"/>
+        <param name="general.camera_model" value="$(var camera_model)"/>
+        <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>
+        <param name="sensors.publish_imu_tf" value="$(var publish_imu_tf)"/>
+        <extra_arg name="use_intra_process_comms" value="true"/>
+      </composable_node>
+    </load_composable_node>
   </group>
 
-  <!-- Object detection is enabled via configuration file (od_enabled: true) -->
-  <!-- No service call needed when using config override -->
+  <!-- Case 2: Object detection mode (no stereo output) -->
+  <group if="$(eval &quot;'$(var enable_zed_object_detection)'=='true' and '$(var enable_stereo_output)'!='true'&quot;)">
+    <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
+      <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
+                       name="$(var camera_name)" namespace="camera">
+        <param from="$(var zed_common_config)"/>
+        <param from="$(var zed_camera_config)"/>
+        <param from="$(var zed_od_config)"/>
+        <param from="$(var zed_custom_od_config)"/>
+        <param from="$(var autosdv_zed_config)"/>
+        <param name="general.camera_name" value="$(var camera_name)"/>
+        <param name="general.camera_model" value="$(var camera_model)"/>
+        <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>
+        <param name="sensors.publish_imu_tf" value="$(var publish_imu_tf)"/>
+        <extra_arg name="use_intra_process_comms" value="true"/>
+      </composable_node>
+    </load_composable_node>
+  </group>
+
+  <!-- Case 3: Stereo output mode for Isaac SLAM (no object detection) -->
+  <group if="$(eval &quot;'$(var enable_zed_object_detection)'!='true' and '$(var enable_stereo_output)'=='true'&quot;)">
+    <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
+      <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
+                       name="$(var camera_name)" namespace="camera">
+        <param from="$(var zed_common_config)"/>
+        <param from="$(var zed_camera_config)"/>
+        <param from="$(var zed_od_config)"/>
+        <param from="$(var zed_custom_od_config)"/>
+        <param from="$(var autosdv_isaac_config)"/>
+        <param name="general.camera_name" value="$(var camera_name)"/>
+        <param name="general.camera_model" value="$(var camera_model)"/>
+        <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>
+        <param name="sensors.publish_imu_tf" value="$(var publish_imu_tf)"/>
+        <extra_arg name="use_intra_process_comms" value="true"/>
+      </composable_node>
+    </load_composable_node>
+  </group>
+
+  <!-- Case 4: Both object detection and stereo output -->
+  <group if="$(eval &quot;'$(var enable_zed_object_detection)'=='true' and '$(var enable_stereo_output)'=='true'&quot;)">
+    <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
+      <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
+                       name="$(var camera_name)" namespace="camera">
+        <param from="$(var zed_common_config)"/>
+        <param from="$(var zed_camera_config)"/>
+        <param from="$(var zed_od_config)"/>
+        <param from="$(var zed_custom_od_config)"/>
+        <param from="$(var autosdv_zed_config)"/>
+        <param from="$(var autosdv_isaac_config)"/>
+        <param name="general.camera_name" value="$(var camera_name)"/>
+        <param name="general.camera_model" value="$(var camera_model)"/>
+        <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>
+        <param name="sensors.publish_imu_tf" value="$(var publish_imu_tf)"/>
+        <extra_arg name="use_intra_process_comms" value="true"/>
+      </composable_node>
+    </load_composable_node>
+  </group>
+
+  <!-- Robot State Publisher for ZED URDF/TF -->
+  <node pkg="robot_state_publisher" exec="robot_state_publisher"
+        name="$(var camera_name)_state_publisher" namespace="/sensing/camera/$(var camera_name)">
+    <param name="robot_description"
+           value="$(command 'xacro $(find-pkg-share zed_wrapper)/urdf/zed_descr.urdf.xacro camera_name:=$(var camera_name) camera_model:=$(var camera_model)')"/>
+    <remap from="robot_description" to="$(var camera_name)_description"/>
+  </node>
 
   <!-- Launch Autoware ZED converter if object detection is enabled -->
   <group if="$(eval &quot;'$(var enable_zed_object_detection)'=='true' and '$(var use_autoware_converter)'=='true'&quot;)">
     <include file="$(find-pkg-share autoware_zed_converter)/launch/converter_node.launch.xml">
       <arg name="node_name" value="zed_object_converter"/>
-      <!-- Note: ZED wrapper uses camera_name as node_name when namespace is specified -->
-      <arg name="input_topic" value="/sensing/camera/$(var camera_name)/$(var camera_name)/obj_det/objects"/>
+      <arg name="input_topic" value="/sensing/camera/$(var camera_name)/obj_det/objects"/>
       <arg name="output_topic" value="/perception/object_recognition/detection/camera_objects"/>
       <arg name="use_tracking_velocity" value="true"/>
       <arg name="existence_probability_threshold" value="0.4"/>

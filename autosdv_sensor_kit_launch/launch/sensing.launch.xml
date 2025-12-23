@@ -15,6 +15,7 @@
   <arg name="use_gnss" default="" description="Enable GNSS: true, false (empty = use suite default)"/>
   <arg name="use_ntrip" default="false" description="Enable NTRIP client for RTK corrections (ublox only)"/>
   <arg name="enable_zed_object_detection" default="" description="Enable ZED object detection: true, false (empty = use suite default)"/>
+  <arg name="enable_stereo_output" default="false" description="Enable left/right stereo output for Isaac SLAM"/>
 
   <!-- Sensor Suite Defaults -->
   <!-- Suite: robin_zed - Robin-W LiDAR + ZED X Mini + ZED IMU (integrated) -->
@@ -98,6 +99,7 @@
       <arg name="launch_driver" value="$(var launch_driver)"/>
       <arg name="camera_model" value="$(var final_camera_model)"/>
       <arg name="enable_zed_object_detection" value="$(var final_enable_zed_od)"/>
+      <arg name="enable_stereo_output" value="$(var enable_stereo_output)"/>
     </include>
 
     <!-- IMU Driver -->

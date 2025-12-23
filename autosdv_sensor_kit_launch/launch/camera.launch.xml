@@ -3,6 +3,7 @@
   <arg name="camera_type" default="left"/>
   <arg name="camera_model" default="zedxm" description="Camera model (zedxm, usb, or none)"/>
   <arg name="enable_zed_object_detection" default="false" description="Enable ZED object detection"/>
+  <arg name="enable_stereo_output" default="false" description="Enable left/right stereo output (for Isaac SLAM)"/>
   <arg name="use_autoware_converter" default="true" description="Convert ZED objects to Autoware format"/>
 
   <!-- Individual USB Camera Arguments -->
@@ -18,12 +19,12 @@
   <arg name="right_camera_device" default="/dev/video3"/>
 
   <!-- ZED Camera Group -->
-  <!-- ZED launch creates its own container and handles namespace internally -->
   <group if="$(eval &quot;'$(var camera_model)'=='zedxm'&quot;)">
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/zed_with_object_detection.launch.xml" if="$(var launch_driver)">
       <arg name="camera_name" value="$(var camera_model)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
       <arg name="enable_zed_object_detection" value="$(var enable_zed_object_detection)"/>
+      <arg name="enable_stereo_output" value="$(var enable_stereo_output)"/>
       <arg name="use_autoware_converter" value="$(var use_autoware_converter)"/>
     </include>
   </group>

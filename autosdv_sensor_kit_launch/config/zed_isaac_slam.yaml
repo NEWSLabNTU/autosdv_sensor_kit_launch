@@ -1,0 +1,31 @@
+/**:
+  ros__parameters:
+    # ZED Configuration for Isaac ROS Visual SLAM
+    # Enables stereo left/right image publishing required for visual SLAM
+
+    video:
+      # Enable left/right stereo image publishing (required for Isaac SLAM)
+      publish_left_right: true
+      publish_rgb: true
+      publish_gray: false
+      publish_raw: false
+      publish_stereo: false
+
+    sensors:
+      publish_imu: true
+      publish_imu_tf: true
+
+    pos_tracking:
+      # Disable ZED's internal positional tracking (Isaac SLAM will handle it)
+      pos_tracking_enabled: false
+      publish_tf: false
+      publish_map_tf: false
+
+    depth:
+      # Enable depth for point cloud
+      publish_depth_map: true
+      publish_point_cloud: true
+      point_cloud_freq: 10.0
+
+    general:
+      pub_frame_rate: 30.0
