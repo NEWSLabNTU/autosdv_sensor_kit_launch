@@ -20,12 +20,18 @@
 
   <!-- ZED Camera Group -->
   <group if="$(eval &quot;'$(var camera_model)'=='zedxm'&quot;)">
+    <!-- Full ZED camera with driver (normal operation) -->
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/zed_with_object_detection.launch.xml" if="$(var launch_driver)">
       <arg name="camera_name" value="$(var camera_model)"/>
       <arg name="camera_model" value="$(var camera_model)"/>
       <arg name="enable_zed_object_detection" value="$(var enable_zed_object_detection)"/>
       <arg name="enable_stereo_output" value="$(var enable_stereo_output)"/>
       <arg name="use_autoware_converter" value="$(var use_autoware_converter)"/>
+    </include>
+    <!-- TF-only mode for simulation (no camera driver, just transforms) -->
+    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/zed_tf_only.launch.xml" unless="$(var launch_driver)">
+      <arg name="camera_name" value="$(var camera_model)"/>
+      <arg name="camera_model" value="$(var camera_model)"/>
     </include>
   </group>
 

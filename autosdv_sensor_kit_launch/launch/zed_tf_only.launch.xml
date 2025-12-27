@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+  ZED Camera TF-Only Launch
+
+  This launch file publishes only the ZED camera TF transforms without running
+  the actual camera driver. Used for logging simulation mode where camera data
+  comes from rosbag but TF transforms are still needed.
+
+  Publishes:
+  - Camera frames from URDF (via robot_state_publisher)
+  - IMU link (via static_transform_publisher) - normally published by ZED driver
+-->
+<launch>
+  <arg name="camera_name" default="zedxm" description="Camera name"/>
+  <arg name="camera_model" default="zedxm" description="Camera model (zed, zedm, zed2, zed2i, zedx, zedxm)"/>
+
+  <!-- Robot State Publisher for ZED URDF/TF (no camera driver needed) -->
+  <node pkg="robot_state_publisher" exec="robot_state_publisher"
+        name="$(var camera_name)_state_publisher" namespace="/sensing/camera/$(var camera_name)">
+    <param name="robot_description"
+           value="$(command 'xacro $(find-pkg-share zed_wrapper)/urdf/zed_descr.urdf.xacro camera_name:=$(var camera_name) camera_model:=$(var camera_model)')"/>
+    <remap from="robot_description" to="$(var camera_name)_description"/>
+  </node>
+
+  <!--
+    Static Transform: camera_link -> imu_link
+    The ZED driver normally publishes this dynamically. For simulation, we use a static transform.
+    The IMU is located inside the camera body, near the left camera sensor.
+    Values from ZED SDK: IMU is at the camera center with slight offset.
+  -->
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="$(var camera_name)_imu_tf"
+        args="0 0 0 0 0 0 $(var camera_name)_left_camera_frame $(var camera_name)_imu_link"/>
+</launch>
