@@ -1,0 +1,75 @@
+sensor_kit_base_link:
+  cube1: # Blickfeld Cube 1 LiDAR
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+  vlp32c: # Velodyne VLP-32C LiDAR
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+  robin_w: # Seyond Robin-W LiDAR
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    # Rotation to convert from Robin-W coords (X:up, Y:right, Z:forward) to ROS coords (X:forward, Y:left, Z:up)
+    # Robin-W: [X:up, Y:right, Z:forward] -> ROS: [X:forward, Y:left, Z:up]
+    # Step 1: Rotate -90° around Y-axis (pitch = -π/2) to bring X from up to forward, Z from forward to down
+    # Step 2: Rotate 180° around X-axis (roll = π) to flip Z from down to up, Y from right to left
+    roll: 3.14159
+    pitch: -1.5708
+    yaw: 0.0
+  zedxm_camera_link:
+    x: 0.05  # 5cm forward of sensor kit base (typical mounting)
+    y: 0.0   # centered
+    z: 0.1   # 10cm above sensor kit base
+    roll: 0.0  # No roll needed for forward-facing camera
+    pitch: 0.0  # Level with horizon (adjust if camera is tilted down)
+    yaw: 0.0  # Facing forward (0 degrees)
+  imu_link:
+    x: 0.000000
+    y: 0.000000
+    z: -0.055
+    roll: 0.000000
+    pitch: 0.00000
+    yaw: 0.000000
+  gnss_base_link:
+    x: 0.000000
+    y: 0.000000
+    z: 0.055  # random value
+    roll: 0.000000
+    pitch: 0.00000
+    yaw: 0.000000
+  usb_camera_front:
+    x: 0.5      # 50cm forward from sensor_kit_base
+    y: 0.0      # centered
+    z: 0.3      # 30cm up
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0    # facing forward
+  usb_camera_rear:
+    x: -0.5     # 50cm backward from sensor_kit_base
+    y: 0.0      # centered
+    z: 0.3      # 30cm up
+    roll: 0.0
+    pitch: 0.0
+    yaw: 3.14159 # facing backward (180 degrees)
+  usb_camera_left:
+    x: 0.0      # centered front-back
+    y: 0.4      # 40cm to the left
+    z: 0.3      # 30cm up
+    roll: 0.0
+    pitch: 0.0
+    yaw: 1.5708 # facing left (90 degrees)
+  usb_camera_right:
+    x: 0.0      # centered front-back
+    y: -0.4     # 40cm to the right
+    z: 0.3      # 30cm up
+    roll: 0.0
+    pitch: 0.0
+    yaw: -1.5708 # facing right (-90 degrees)
