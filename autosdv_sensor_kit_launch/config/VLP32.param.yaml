@@ -5,7 +5,7 @@
     data_port: 2368
     gnss_port: 2369
     packet_mtu_size: 1500
-    launch_hw: true
+    # launch_hw is controlled by launch file, don't override here
     setup_sensor: true
     frame_id: vlp32c
     advanced_diagnostics: false
