@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+  ZED camera -> ZED IMU transform, for when the ZED driver is not running.
+
+  The driver is the authority on this transform: it reads the per-unit factory
+  extrinsics out of the camera over the SDK and broadcasts
+  <camera>_left_camera_frame -> <camera>_imu_link itself whenever
+  sensors.publish_imu_tf is set. Nothing here should run alongside it, or two
+  publishers fight over the same edge.
+
+  A static fallback exists only because the vendor URDF has no equivalent:
+  zed_wrapper's zed_macro.urdf.xacro defines camera_link, camera_center and the
+  left/right camera frames, and a mag/baro/temp block for zed2, but no
+  imu_link for any model. So with the driver disabled - logging simulation,
+  rosbag replay - the frame simply does not exist, imu_corrector rejects every
+  message with "Please publish TF base_link to <camera>_imu_link", and
+  gyro_odometer goes silent. See docs/reports/cuda-ndt-coss-replay.md.
+
+  The offsets default to zero, which is what this repository has always
+  assumed. To replace them with the real numbers, run the driver on the vehicle
+  once and read the transform it publishes:
+
+      ros2 run tf2_ros tf2_echo zedxm_left_camera_frame zedxm_imu_link
+
+  then set the args below from that output. Keep them here rather than inline
+  in a caller: this is the one home for the fallback geometry, and both
+  camera.launch.xml (TF-only mode) and imu.launch.xml (ZED IMU without ZED
+  video) include it.
+-->
+<launch>
+  <arg name="camera_name" default="zedxm" description="Camera name, prefixes both frames"/>
+
+  <arg name="x" default="0.0" description="[m] IMU offset from the left camera frame"/>
+  <arg name="y" default="0.0" description="[m]"/>
+  <arg name="z" default="0.0" description="[m]"/>
+  <arg name="roll" default="0.0" description="[rad]"/>
+  <arg name="pitch" default="0.0" description="[rad]"/>
+  <arg name="yaw" default="0.0" description="[rad]"/>
+
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="$(var camera_name)_imu_tf"
+        args="--x $(var x) --y $(var y) --z $(var z)
+              --roll $(var roll) --pitch $(var pitch) --yaw $(var yaw)
+              --frame-id $(var camera_name)_left_camera_frame
+              --child-frame-id $(var camera_name)_imu_link"/>
+</launch>

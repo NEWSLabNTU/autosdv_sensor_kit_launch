@@ -7,8 +7,8 @@
   comes from rosbag but TF transforms are still needed.
 
   Publishes:
-  - Camera frames from URDF (via robot_state_publisher)
-  - IMU link (via static_transform_publisher) - normally published by ZED driver
+  - Camera frames from the vendor URDF (via robot_state_publisher)
+  - IMU link, via zed_imu_tf.launch.xml, which owns the fallback geometry
 -->
 <launch>
   <arg name="camera_name" default="zedxm" description="Camera name"/>
@@ -22,12 +22,9 @@
     <remap from="robot_description" to="$(var camera_name)_description"/>
   </node>
 
-  <!--
-    Static Transform: camera_link -> imu_link
-    The ZED driver normally publishes this dynamically. For simulation, we use a static transform.
-    The IMU is located inside the camera body, near the left camera sensor.
-    Values from ZED SDK: IMU is at the camera center with slight offset.
-  -->
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="$(var camera_name)_imu_tf"
-        args="0 0 0 0 0 0 $(var camera_name)_left_camera_frame $(var camera_name)_imu_link"/>
+  <!-- left_camera_frame -> imu_link, which the vendor URDF omits and the
+       driver would otherwise publish itself -->
+  <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/zed_imu_tf.launch.xml">
+    <arg name="camera_name" value="$(var camera_name)"/>
+  </include>
 </launch>
