@@ -11,6 +11,25 @@
 
   Chain: cloud ; ring_filter (one channel) ; pointcloud_to_laserscan ; scan.
 
+  ONE RING OR A GROUP. A single ring is geometrically a perfect plane: zero
+  vertical extent at every range, so it emulates a 2-D LiDAR exactly. Its
+  drawback is density ; one channel of a 128-ring spinner is sparse, and measured
+  on the sample site a single ring reached only 3 of 5 seeds inside the 1.0 m
+  accuracy gate (median 0.992 m) against 5 of 5 for a thicker slab (0.821 m).
+
+  Adjacent channels are tightly packed, so a small group stays close to planar
+  while carrying more returns. Measured on this VLS128, neighbouring channels sit
+  0.11 deg apart:
+
+      group           span      z at 10 m   30 m    60 m
+      1 ring          0.00 deg    0.00 m   0.00 m  0.00 m
+      3 rings 70-72   0.22 deg    0.04 m   0.12 m  0.23 m
+      5 rings 69-73   0.44 deg    0.08 m   0.23 m  0.46 m
+
+  Three rings are therefore TIGHTER than the 0.30 m fixed slab beyond about
+  30 m, while carrying roughly three times a single ring's returns. Set ring for
+  one channel, or ring_min/ring_max for a group.
+
   WHY THE Z LIMITS ARE DELIBERATELY WIDE. A single ring is a cone, not a plane:
   it leaves the sensor at a fixed elevation, so its height above the sensor grows
   with range (a 1 degree ring is about +-1 m at 60 m). A z band tight enough to
@@ -32,7 +51,11 @@
   <arg name="input_topic" description="3-D cloud carrying a per-point ring field"/>
   <arg name="output_topic" default="/scan_raw"
        description="LaserScan for MCL's normaliser"/>
-  <arg name="ring" description="channel to extract; measure with inspect_rings.py"/>
+  <arg name="ring" default="" description="single channel to extract; shorthand for
+                    ring_min = ring_max. Measure it with inspect_rings.py"/>
+  <arg name="ring_min" default="$(var ring)"
+       description="lowest channel to keep; use with ring_max to keep a group"/>
+  <arg name="ring_max" default="$(var ring)" description="highest channel to keep"/>
   <arg name="ring_field" default="channel"
        description="uint16 field naming the ring; 'channel' on the Velodyne
                     drivers in this repo, 'ring' on some others"/>
@@ -51,8 +74,8 @@
     <remap from="input" to="$(var input_topic)"/>
     <remap from="output" to="scan_ring_filter/pointcloud"/>
     <param name="filter_field_name" value="$(var ring_field)"/>
-    <param name="filter_limit_min" value="$(var ring)"/>
-    <param name="filter_limit_max" value="$(var ring)"/>
+    <param name="filter_limit_min" value="$(var ring_min)"/>
+    <param name="filter_limit_max" value="$(var ring_max)"/>
     <param name="filter_limit_negative" value="false"/>
     <param name="keep_organized" value="false"/>
     <param name="use_sim_time" value="$(var use_sim_time)"/>
