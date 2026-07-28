@@ -3,6 +3,16 @@
   scan_from_ring.launch.xml ; produce a 2-D LaserScan by extracting one ring
   from a 3-D LiDAR.
 
+  APPLIES TO SPINNING LiDARs ONLY. Ring extraction assumes the sensor sweeps a
+  set of constant-elevation rings, which is what a spinning Velodyne does. The
+  kit's other two sensors are solid-state and this file is not for them:
+  Robin-W and Cube1 have restricted fields of view and scan patterns whose
+  "channel" index does not correspond to a fixed elevation, so selecting one
+  would not yield a horizontal plane. A restricted FOV is also a problem for MCL
+  independently of geometry: the filter matches a scan against a 360 degree
+  occupancy grid, and a narrow wedge gives far weaker angular constraint. Use
+  those sensors with the 3-D NDT path, or with a native 2-D LiDAR alongside.
+
   This lives in the sensor kit, not in the localization package, because the
   choice of ring is a property of THIS sensor on THIS vehicle: which elevation
   is useful depends on the mounting height and pitch. MCL consumes whatever

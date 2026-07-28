@@ -15,6 +15,11 @@
     whatever LaserScan appears on scan_topic and resolves the offset itself. See
     docs/design/mcl-user-setup-ux.md.
 
+    Only the spinning vlp32c dispatches a scan producer. Robin-W and Cube1 are
+    solid-state with restricted fields of view: their channel index is not a
+    constant elevation, so ring extraction would not produce a horizontal plane,
+    and a narrow FOV constrains MCL poorly against a 360 degree grid regardless.
+
     scan_ring has no default on purpose. There is no safe one: the horizontal
     channel is sensor-specific and not the middle index; measured on the
     Autoware sample bag's VLS128 it is 71 of 0..127. Measure yours with
