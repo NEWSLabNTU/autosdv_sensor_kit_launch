@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+  scan_from_ring.launch.xml ; produce a 2-D LaserScan by extracting one ring
+  from a 3-D LiDAR.
+
+  This lives in the sensor kit, not in the localization package, because the
+  choice of ring is a property of THIS sensor on THIS vehicle: which elevation
+  is useful depends on the mounting height and pitch. MCL consumes whatever
+  LaserScan the kit publishes and resolves the mounting offset itself. See
+  docs/design/mcl-user-setup-ux.md.
+
+  Chain: cloud ; ring_filter (one channel) ; pointcloud_to_laserscan ; scan.
+
+  WHY THE Z LIMITS ARE DELIBERATELY WIDE. A single ring is a cone, not a plane:
+  it leaves the sensor at a fixed elevation, so its height above the sensor grows
+  with range (a 1 degree ring is about +-1 m at 60 m). A z band tight enough to
+  isolate one ring near the sensor would clip that same ring at distance, and one
+  loose enough to keep it would admit neighbouring rings. Ring selection alone
+  does the work here, and it is independent of vehicle height by construction ;
+  which is the point, since the z-band approach it replaces silently selected an
+  empty slab whenever the mounting height changed.
+
+  CHOOSING `ring`. Measure it, do not guess: run
+  scripts/sensor/inspect_rings.py over a recorded bag (see that script's usage
+  text for its flags; exact command lines cannot be written here because XML
+  forbids a double hyphen inside a comment). It reports each channel's median
+  elevation, so the horizontal one is identified from the data. The datasheet
+  order is not a reliable guide: the VLS128's elevations are non-uniform and its
+  horizontal channel is 71, nowhere near the middle index.
+-->
+<launch>
+  <arg name="input_topic" description="3-D cloud carrying a per-point ring field"/>
+  <arg name="output_topic" default="/scan_raw"
+       description="LaserScan for MCL's normaliser"/>
+  <arg name="ring" description="channel to extract; measure with inspect_rings.py"/>
+  <arg name="ring_field" default="channel"
+       description="uint16 field naming the ring; 'channel' on the Velodyne
+                    drivers in this repo, 'ring' on some others"/>
+  <arg name="range_max" default="60.0"/>
+  <arg name="scan_frame" default=""
+       description="target frame for flattening; empty keeps the cloud's own
+                    frame, which is what MCL's normaliser expects to resolve"/>
+  <arg name="use_sim_time" default="false"/>
+
+  <!-- Ring selection. filter_limit_min and _max are both the chosen ring, so a
+       single channel survives. PassThroughFilterUInt16 is the same component
+       lidar_marker_localizer uses for its ring_filter. -->
+  <node pkg="autoware_pointcloud_preprocessor"
+        exec="passthrough_filter_uint16_node"
+        name="scan_ring_filter">
+    <remap from="input" to="$(var input_topic)"/>
+    <remap from="output" to="scan_ring_filter/pointcloud"/>
+    <param name="filter_field_name" value="$(var ring_field)"/>
+    <param name="filter_limit_min" value="$(var ring)"/>
+    <param name="filter_limit_max" value="$(var ring)"/>
+    <param name="filter_limit_negative" value="false"/>
+    <param name="keep_organized" value="false"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="pointcloud_to_laserscan" exec="pointcloud_to_laserscan_node"
+        name="scan_from_ring">
+    <remap from="~/input/pointcloud" to="scan_ring_filter/pointcloud"/>
+    <remap from="~/output/laserscan" to="$(var output_topic)"/>
+    <param name="target_frame" value="$(var scan_frame)"/>
+    <!-- Wide on purpose; see the header. -->
+    <param name="min_height" value="-100.0"/>
+    <param name="max_height" value="100.0"/>
+    <param name="angle_min" value="-3.14159"/>
+    <param name="angle_max" value="3.14159"/>
+    <param name="angle_increment" value="0.0043"/>
+    <param name="range_min" value="0.1"/>
+    <param name="range_max" value="$(var range_max)"/>
+    <param name="use_inf" value="true"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+</launch>

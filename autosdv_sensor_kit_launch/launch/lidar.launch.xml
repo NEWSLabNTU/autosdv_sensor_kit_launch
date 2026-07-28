@@ -9,6 +9,27 @@
   <arg name="robin_w_device_ip" default="172.168.1.10"/>
   <arg name="vlp32c_device_ip" default="192.168.7.10"/>
 
+  <!--
+    2-D scan production for pose_source:=mcl. The kit owns this because the
+    choice of ring depends on this sensor's mounting on this vehicle; MCL takes
+    whatever LaserScan appears on scan_topic and resolves the offset itself. See
+    docs/design/mcl-user-setup-ux.md.
+
+    scan_ring has no default on purpose. There is no safe one: the horizontal
+    channel is sensor-specific and not the middle index; measured on the
+    Autoware sample bag's VLS128 it is 71 of 0..127. Measure yours with
+    scripts/sensor/inspect_rings.py, which reports per-channel elevation and
+    warns when a ring points too far up to ever meet the ground.
+  -->
+  <arg name="publish_scan" default="false"
+       description="publish a 2-D LaserScan for pose_source:=mcl"/>
+  <arg name="scan_ring" default=""
+       description="ring/channel to extract; measure with inspect_rings.py"/>
+  <arg name="scan_topic" default="/scan_raw"
+       description="LaserScan topic MCL's normaliser consumes"/>
+  <arg name="scan_input_topic" default="/sensing/lidar/top/pointcloud_raw_ex"
+       description="3-D cloud to extract the ring from"/>
+
   <group>
     <push-ros-namespace namespace="lidar"/>
 
@@ -32,6 +53,14 @@
           <arg name="config_file" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/VLP32.param.yaml"/>
         </include>
       </group>
+    </group>
+
+    <group if="$(var publish_scan)">
+      <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/scan_from_ring.launch.xml">
+        <arg name="input_topic" value="$(var scan_input_topic)"/>
+        <arg name="output_topic" value="$(var scan_topic)"/>
+        <arg name="ring" value="$(var scan_ring)"/>
+      </include>
     </group>
 
     <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/pointcloud_preprocessor.launch.py">
