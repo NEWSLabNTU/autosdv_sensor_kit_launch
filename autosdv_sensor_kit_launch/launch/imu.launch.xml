@@ -13,6 +13,22 @@
       <arg name="camera_name" value="zedxm"/>
       <arg name="camera_model" value="zedxm"/>
     </include>
+
+    <!--
+      Without the driver, nothing publishes base_link -> zedxm_imu_link, and
+      imu_corrector then drops every IMU message ("Please publish TF base_link
+      to zedxm_imu_link") so gyro_odometer emits no twist at all: the EKF stops
+      propagating and hands NDT a frozen initial guess. camera.launch.xml has
+      zed_tf_only.launch.xml for exactly this case, but its ZED group requires
+      camera_model:=zedxm, so the vlp32c_zed_imu suite (camera_model:=none,
+      imu_source:=zed) reached logging simulation with no publisher at all, and
+      silently: the only symptom is a per-message warning from another node.
+      Same transform as zed_tf_only.launch.xml, which stays responsible
+      for the camera_model:=zedxm case so the two never both publish it.
+    -->
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="zedxm_imu_tf"
+          args="--frame-id zedxm_left_camera_frame --child-frame-id zedxm_imu_link"
+          unless="$(var launch_driver)"/>
   </group>
 
   <!-- IMU processing nodes under /sensing/imu namespace -->
