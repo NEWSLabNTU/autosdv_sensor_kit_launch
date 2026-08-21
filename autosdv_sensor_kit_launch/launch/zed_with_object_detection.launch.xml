@@ -6,8 +6,15 @@
   <arg name="enable_zed_object_detection" default="false" description="Enable ZED object detection"/>
   <arg name="enable_stereo_output" default="false" description="Enable left/right stereo output (for Isaac SLAM)"/>
   <arg name="use_autoware_converter" default="true" description="Convert ZED objects to Autoware format"/>
-  <arg name="publish_tf" default="true" description="Publish TF"/>
-  <arg name="publish_imu_tf" default="true" description="Publish IMU TF"/>
+  <!-- Default false, deliberately: the vehicle URDF already carries the full
+       sensor_kit_base_link -> zedxm_* chain, so the ZED broadcasting its own
+       odom -> zedxm_camera_link gives the camera link a second parent. The
+       dynamic edge wins and re-parents the whole ZED subtree out of
+       base_link's tree, which is why the ZED cloud "disappears" in RViz with
+       fixed frame base_link. Positional tracking itself stays on (object
+       detection requires it); only the broadcast is suppressed. -->
+  <arg name="publish_tf" default="false" description="Publish ZED odom TF (conflicts with the URDF sensor chain)"/>
+  <arg name="publish_imu_tf" default="false" description="Publish ZED IMU TF"/>
 
   <!-- Config file paths from zed_wrapper package -->
   <let name="zed_common_config" value="$(find-pkg-share zed_wrapper)/config/common_stereo.yaml"/>
