@@ -9,6 +9,7 @@
 
   <!-- Individual Sensor Configuration (can override suite defaults) -->
   <arg name="lidar_model" default="" description="LiDAR model: robin-w, vlp32c, cube1 (empty = use suite default)"/>
+  <arg name="pointcloud_backend" default="cpu" description="cpu or cuda: which hardware runs sensing-side point cloud preprocessing (cuda needs vlp32c)"/>
   <arg name="camera_model" default="" description="Camera model: zedxm, usb, none (empty = use suite default)"/>
   <arg name="imu_source" default="" description="IMU source: mpu9250, zed (empty = use suite default)"/>
   <arg name="gnss_receiver" default="" description="GNSS receiver: ublox, septentrio, garmin (empty = use suite default)"/>
@@ -100,6 +101,7 @@
       <arg name="lidar_model" value="$(var final_lidar_model)"/>
       <arg name="vehicle_mirror_param_file" value="$(var vehicle_mirror_param_file)"/>
       <arg name="pointcloud_container_name" value="$(var pointcloud_container_name)"/>
+      <arg name="pointcloud_backend" value="$(var pointcloud_backend)"/>
     </include>
 
     <!-- Camera Driver -->

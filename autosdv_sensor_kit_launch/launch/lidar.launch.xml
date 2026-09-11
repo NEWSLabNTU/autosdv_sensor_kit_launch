@@ -1,6 +1,10 @@
 <launch>
   <arg name="launch_driver" default="true"/>
   <arg name="lidar_model" default="vlp32c" description="cube1, robin-w, or vlp32c"/>
+  <!-- cpu or cuda: which hardware runs the sensing preprocessing stage. cuda
+       needs a per-point time offset and so applies to vlp32c only; see the
+       docstring in pointcloud_preprocessor.launch.py. -->
+  <arg name="pointcloud_backend" default="cpu" description="cpu or cuda: sensing-side point cloud preprocessing"/>
   <!-- <arg name="host_ip" default="192.168.26.1"/> -->
   <arg name="use_concat_filter" default="true"/>
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
@@ -74,6 +78,7 @@
       <arg name="use_multithread" value="true"/>
       <arg name="pointcloud_container_name" value="$(var pointcloud_container_name)"/>
       <arg name="lidar_model" value="$(var lidar_model)"/>
+      <arg name="pointcloud_backend" value="$(var pointcloud_backend)"/>
     </include>
   </group>
 </launch>
