@@ -25,14 +25,13 @@ for Velodyne -- so there is one host-to-device copy at the preprocessor's input.
 
 Three things worth knowing before changing any of this.
 
-1. ONLY THE VELODYNE CAN BE PREPROCESSED. The CUDA node fuses cropping with
+1. NOT EVERY LIDAR CAN BE PREPROCESSED. The CUDA node fuses cropping with
    distortion correction, which needs a per-point time offset. Nebula publishes
-   `velodyne_points` in the PointXYZIRCAEDT layout, which carries one. The Seyond
-   driver registers PointXYZIRC -- x, y, z, intensity, return_type, ring -- and
-   the Blickfeld driver publishes no per-point time either, so neither can be
-   deskewed by anything, CPU or GPU. `pointcloud_backend:=cuda` with those models
-   is refused rather than silently ignored. See phase 2.3 of
-   docs/roadmap/6-golfcart-backport.md, which adds the field to the Seyond driver.
+   `velodyne_points` in the PointXYZIRCAEDT layout, which carries one, and
+   `seyond_ros_driver` publishes the same layout from autosdv-1.5.0 onwards.
+   The Blickfeld driver publishes no per-point time at all, so a cube1 cloud
+   cannot be deskewed by anything, CPU or GPU, and `pointcloud_backend:=cuda`
+   with it is refused rather than silently ignored.
 
 2. THE CONCATENATOR IS NOT USED HERE, and cannot be. Both the CPU and the CUDA
    concatenator refuse a single input topic:
@@ -80,7 +79,12 @@ LIDAR_TOPICS = {
 
 # Models whose layout carries a per-point time offset, and can therefore be
 # deskewed. See point 1 in the module docstring.
-DESKEWABLE = ("vlp32c",)
+#
+# robin-w joined this list when seyond_ros_driver gained PointXYZIRCAEDT; it
+# requires a driver built at autosdv-1.5.0 or later, with the default
+# POINT_TYPE. A driver built as PointXYZIRC publishes a cloud the CUDA
+# preprocessor will reject at runtime rather than deskew.
+DESKEWABLE = ("vlp32c", "robin-w")
 
 TWIST_TOPIC = "/sensing/vehicle_velocity_converter/twist_with_covariance"
 IMU_TOPIC = "/sensing/imu/imu_data"
