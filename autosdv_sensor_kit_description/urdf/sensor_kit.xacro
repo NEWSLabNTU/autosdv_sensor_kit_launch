@@ -1,11 +1,22 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- WARNING, never write a colon followed by a space inside a comment in
+       this file. Comments survive xacro expansion into robot_description, ROS
+       2 launch YAML-parses parameter values, and a colon-space makes the whole
+       URDF fail safe_load. Reproduced on this stack with plain ros2 launch,
+       which reports "mapping values are not allowed here" and points at the
+       comment, while the stack simply never comes up. Nothing else names a
+       comment as the cause.
+
+       Note that a warning phrased as "no word<colon><space>word in comments"
+       contains the thing it forbids and reproduces the bug exactly, which is
+       why this one spells it out in words. -->
   <xacro:macro name="sensor_kit_macro" params="parent x y z roll pitch yaw">
     <xacro:include filename="$(find zed_wrapper)/urdf/zed_macro.urdf.xacro"/>
     <xacro:include filename="$(find imu_description)/urdf/imu.xacro"/>
     <xacro:include filename="$(find blickfeld_driver)/config/blickfeld_cube1.xacro"/>
     <xacro:arg name="gpu" default="false"/>
-    <xacro:arg name="config_dir" default="$(find individual_params)/config/default/autosdv_sensor_kit"/>b
+    <xacro:arg name="config_dir" default="$(find individual_params)/config/default/autosdv_sensor_kit"/>
 
     <xacro:property name="sensor_kit_base_link" default="sensor_kit_base_link"/>
 
