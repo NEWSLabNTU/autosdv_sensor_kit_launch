@@ -4,7 +4,6 @@
   <arg name="camera_name" default="zedxm" description="Camera name"/>
   <arg name="camera_model" default="zedxm" description="Camera model (zed, zedm, zed2, zed2i, zedx, zedxm)"/>
   <arg name="enable_zed_object_detection" default="false" description="Enable ZED object detection"/>
-  <arg name="enable_stereo_output" default="false" description="Enable left/right stereo output (for Isaac SLAM)"/>
   <arg name="use_autoware_converter" default="true" description="Convert ZED objects to Autoware format"/>
   <!-- Default false, deliberately: the vehicle URDF already carries the full
        sensor_kit_base_link -> zedxm_* chain, so the ZED broadcasting its own
@@ -22,7 +21,6 @@
   <let name="zed_od_config" value="$(find-pkg-share zed_wrapper)/config/object_detection.yaml"/>
   <let name="zed_custom_od_config" value="$(find-pkg-share zed_wrapper)/config/custom_object_detection.yaml"/>
   <let name="autosdv_zed_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_object_detection.yaml"/>
-  <let name="autosdv_isaac_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_isaac_slam.yaml"/>
 
   <!--
     ZED Camera Launch using direct XML composable node loading.
@@ -51,8 +49,8 @@
 
     This provides clean topic paths without extra node name nesting.
   -->
-  <!-- Case 1: Basic mode (no object detection, no stereo output) -->
-  <group if="$(eval &quot;'$(var enable_zed_object_detection)'!='true' and '$(var enable_stereo_output)'!='true'&quot;)">
+  <!-- Without object detection -->
+  <group unless="$(var enable_zed_object_detection)">
     <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
       <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
                        name="$(var camera_name)" namespace="camera">
@@ -69,8 +67,8 @@
     </load_composable_node>
   </group>
 
-  <!-- Case 2: Object detection mode (no stereo output) -->
-  <group if="$(eval &quot;'$(var enable_zed_object_detection)'=='true' and '$(var enable_stereo_output)'!='true'&quot;)">
+  <!-- With object detection -->
+  <group if="$(var enable_zed_object_detection)">
     <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
       <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
                        name="$(var camera_name)" namespace="camera">
@@ -79,45 +77,6 @@
         <param from="$(var zed_od_config)"/>
         <param from="$(var zed_custom_od_config)"/>
         <param from="$(var autosdv_zed_config)"/>
-        <param name="general.camera_name" value="$(var camera_name)"/>
-        <param name="general.camera_model" value="$(var camera_model)"/>
-        <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>
-        <param name="sensors.publish_imu_tf" value="$(var publish_imu_tf)"/>
-        <extra_arg name="use_intra_process_comms" value="true"/>
-      </composable_node>
-    </load_composable_node>
-  </group>
-
-  <!-- Case 3: Stereo output mode for Isaac SLAM (no object detection) -->
-  <group if="$(eval &quot;'$(var enable_zed_object_detection)'!='true' and '$(var enable_stereo_output)'=='true'&quot;)">
-    <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
-      <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
-                       name="$(var camera_name)" namespace="camera">
-        <param from="$(var zed_common_config)"/>
-        <param from="$(var zed_camera_config)"/>
-        <param from="$(var zed_od_config)"/>
-        <param from="$(var zed_custom_od_config)"/>
-        <param from="$(var autosdv_isaac_config)"/>
-        <param name="general.camera_name" value="$(var camera_name)"/>
-        <param name="general.camera_model" value="$(var camera_model)"/>
-        <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>
-        <param name="sensors.publish_imu_tf" value="$(var publish_imu_tf)"/>
-        <extra_arg name="use_intra_process_comms" value="true"/>
-      </composable_node>
-    </load_composable_node>
-  </group>
-
-  <!-- Case 4: Both object detection and stereo output -->
-  <group if="$(eval &quot;'$(var enable_zed_object_detection)'=='true' and '$(var enable_stereo_output)'=='true'&quot;)">
-    <load_composable_node target="/sensing/camera/$(var camera_name)/zed_container">
-      <composable_node pkg="zed_components" plugin="stereolabs::ZedCamera"
-                       name="$(var camera_name)" namespace="camera">
-        <param from="$(var zed_common_config)"/>
-        <param from="$(var zed_camera_config)"/>
-        <param from="$(var zed_od_config)"/>
-        <param from="$(var zed_custom_od_config)"/>
-        <param from="$(var autosdv_zed_config)"/>
-        <param from="$(var autosdv_isaac_config)"/>
         <param name="general.camera_name" value="$(var camera_name)"/>
         <param name="general.camera_model" value="$(var camera_model)"/>
         <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>
