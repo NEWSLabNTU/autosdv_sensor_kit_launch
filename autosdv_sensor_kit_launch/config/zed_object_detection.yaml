@@ -1,30 +1,62 @@
+# ZED object detection, overriding the wrapper's own defaults.
+#
+# Every key here must EXIST in the wrapper's configs, not merely look
+# plausible: the node declares its parameters and rejects one it does not know,
+# so a renamed key is a startup failure, not a setting that quietly does
+# nothing.
+#
+# This file previously used the SDK 4.x spelling -- `model`, a single
+# `confidence_threshold`, `mc_people`/`mc_vehicle`/... booleans, and a
+# `point_cloud:` section. The 5.x wrapper renamed all of them (5.1 and 5.4 agree;
+# the change is older than either), so those lines had stopped matching anything
+# the node declares. Checked against
+# `zed_wrapper/config/{common_stereo,object_detection}.yaml` at v5.4.1.
 /**:
   ros__parameters:
-    # Object Detection Configuration for ZED Camera
     object_detection:
-      od_enabled: true  # Enable object detection
-      model: 'MULTI_CLASS_BOX_ACCURATE'  # Options: MULTI_CLASS_BOX_FAST, MULTI_CLASS_BOX_MEDIUM, MULTI_CLASS_BOX_ACCURATE
-      allow_reduced_precision_inference: true  # Allow reduced precision for better performance on Jetson
-      max_range: 20.0  # Maximum detection range in meters
-      confidence_threshold: 40.0  # Minimum confidence threshold (0-100)
-      object_tracking_enabled: true  # Enable object tracking
-      prediction_timeout: 0.5  # Prediction timeout in seconds
-      filtering_mode: 'NMS3D'  # Options: 'NONE', 'NMS3D', 'NMS3D_PER_CLASS'
+      od_enabled: true
+      # `model` in SDK 4.x. Options: MULTI_CLASS_BOX_FAST,
+      # MULTI_CLASS_BOX_MEDIUM, MULTI_CLASS_BOX_ACCURATE, plus the CUSTOM_*
+      # models that need custom_object_detection.yaml.
+      detection_model: 'MULTI_CLASS_BOX_ACCURATE'
+      allow_reduced_precision_inference: true   # matters on Jetson
+      max_range: 20.0            # [m]
+      enable_tracking: true      # `object_tracking_enabled` in SDK 4.x
+      prediction_timeout: 0.5    # [s]
+      filtering_mode: 'NMS3D'    # NONE | NMS3D | NMS3D_PER_CLASS
 
-      # Multi-class detection settings
-      mc_people: true      # Detect people
-      mc_vehicle: true     # Detect vehicles
-      mc_animal: true      # Detect animals
-      mc_bag: false        # Detect bags
-      mc_electronics: false # Detect electronics
-      mc_fruit_vegetable: false # Detect fruits/vegetables
-      mc_sport: false      # Detect sports equipment
+      # Per class now, where SDK 4.x had `mc_<class>` booleans and one global
+      # confidence. A road vehicle cares about people and vehicles; the rest are
+      # detections we would only have to filter out again downstream.
+      class:
+        people:
+          enabled: true
+          confidence_threshold: 40.0
+        vehicle:
+          enabled: true
+          confidence_threshold: 40.0
+        animal:
+          enabled: true
+          confidence_threshold: 40.0
+        bag:
+          enabled: false
+          confidence_threshold: 40.0
+        electronics:
+          enabled: false
+          confidence_threshold: 45.0
+        fruit_vegetable:
+          enabled: false
+          confidence_threshold: 50.0
+        sport:
+          enabled: false
+          confidence_threshold: 30.0
 
-    # Body Tracking Configuration (optional, disabled by default)
+    # Off: it costs a second inference pass on the same GPU that is already
+    # running the perception stack, and nothing downstream consumes skeletons.
     body_tracking:
-      bt_enabled: false  # Disable body tracking for better performance
-      model: 'HUMAN_BODY_FAST'  # Options: HUMAN_BODY_FAST, HUMAN_BODY_MEDIUM, HUMAN_BODY_ACCURATE
-      body_format: 'BODY_18'  # Body format
+      bt_enabled: false
+      model: 'HUMAN_BODY_FAST'
+      body_format: 'BODY_18'
       allow_reduced_precision_inference: true
       max_range: 10.0
       confidence_threshold: 50.0
@@ -32,29 +64,21 @@
       enable_tracking: true
       enable_body_fitting: false
       prediction_timeout_s: 0.5
-      body_kp_selection: 'FULL'  # FULL, UPPER_BODY
+      body_kp_selection: 'FULL'
 
-    # Debug settings
     debug:
       debug_object_detection: false
       debug_body_tracking: false
 
-    # Sensors settings
     sensors:
-      publish_imu_tf: true  # Enable IMU TF frame broadcasting
+      publish_imu_tf: true
 
-    # General settings (keep existing ZED settings)
     general:
-      camera_model: 'zedxm'
-      pub_resolution: 'NATIVE'  # Use native resolution
-      pub_frame_rate: 15.0  # Publish rate for object detection
+      pub_resolution: 'NATIVE'
+      pub_frame_rate: 15.0
 
-    # Point cloud settings (ensure point cloud is published)
-    point_cloud:
-      point_cloud_enabled: true  # Always publish point cloud
-      point_cloud_freq: 15.0  # Point cloud publish rate
-
-    # Depth settings
+    # The point cloud lives under `depth:` in 5.x; there is no `point_cloud:`
+    # section any more, and `point_cloud_enabled` is now `publish_point_cloud`.
     depth:
-      min_depth: 0.3  # Minimum depth in meters
-      max_depth: 20.0  # Maximum depth in meters
+      publish_point_cloud: true
+      point_cloud_freq: 15.0
