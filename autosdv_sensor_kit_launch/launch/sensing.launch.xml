@@ -8,8 +8,8 @@
   <arg name="sensor_suite" default="custom" description="Predefined sensor suite: robin_zed, robin_zed_mpu, vlp32c_zed, vlp32c_zed_mpu, vlp32c_zed_imu, cube1_usb, custom"/>
 
   <!-- Individual Sensor Configuration (can override suite defaults) -->
-  <arg name="lidar_model" default="" description="LiDAR model: robin-w, vlp32c, cube1 (empty = use suite default)"/>
-  <arg name="pointcloud_backend" default="cpu" description="cpu or cuda: which hardware runs sensing-side point cloud preprocessing (cuda needs vlp32c)"/>
+  <arg name="lidar_model" default="" description="LiDAR model: robin-w, vlp16, vlp32c, cube1 (empty = use suite default)"/>
+  <arg name="pointcloud_backend" default="cpu" description="cpu or cuda: which hardware runs sensing-side point cloud preprocessing (cuda supports vlp16, vlp32c, and robin-w)"/>
   <arg name="camera_model" default="" description="Camera model: zedxm, usb, none (empty = use suite default)"/>
   <arg name="imu_source" default="" description="IMU source: mpu9250, zed (empty = use suite default)"/>
   <arg name="gnss_receiver" default="" description="GNSS receiver: ublox, septentrio, garmin (empty = use suite default)"/>

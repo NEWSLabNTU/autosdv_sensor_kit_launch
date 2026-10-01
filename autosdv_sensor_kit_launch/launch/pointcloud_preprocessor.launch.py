@@ -73,6 +73,7 @@ BACKENDS = ("cpu", "cuda")
 # Model -> raw topic. The value is what the driver publishes.
 LIDAR_TOPICS = {
     "vlp32c": "/sensing/lidar/velodyne_points",
+    "vlp16": "/sensing/lidar/velodyne_points",
     "cube1": "/sensing/lidar/bf_lidar/points_raw",
     "robin-w": "/sensing/lidar/iv_points",
 }
@@ -84,7 +85,7 @@ LIDAR_TOPICS = {
 # requires a driver built at autosdv-1.5.0 or later, with the default
 # POINT_TYPE. A driver built as PointXYZIRC publishes a cloud the CUDA
 # preprocessor will reject at runtime rather than deskew.
-DESKEWABLE = ("vlp32c", "robin-w")
+DESKEWABLE = ("vlp32c", "vlp16", "robin-w")
 
 TWIST_TOPIC = "/sensing/vehicle_velocity_converter/twist_with_covariance"
 IMU_TOPIC = "/sensing/imu/imu_data"

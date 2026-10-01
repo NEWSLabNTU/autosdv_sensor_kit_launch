@@ -35,7 +35,7 @@ Located in `autosdv_sensor_kit_launch/`, this package contains launch files for:
 Supported LiDAR models:
 - Blickfeld Cube1 LiDAR
 - Seyond Robin-W Solid-State LiDAR
-- Velodyne 32C LiDAR (via optional configuration)
+- Velodyne VLP16 and VLP32C LiDARs (with separate driver configurations)
 
 Launch files:
 - `launch/lidar.launch.xml`: Main launch file for LiDAR sensors
@@ -109,8 +109,12 @@ Each sensor can be configured through launch arguments:
 #### LiDAR Configuration
 
 ```bash
-# Specify LiDAR model (cube1 or robin-w)
+# Specify LiDAR model (cube1, robin-w, vlp16, or vlp32c)
 ros2 launch autosdv_sensor_kit_launch lidar.launch.xml lidar_model:=cube1
+
+# Select either Velodyne model
+ros2 launch autosdv_sensor_kit_launch lidar.launch.xml lidar_model:=vlp16
+ros2 launch autosdv_sensor_kit_launch lidar.launch.xml lidar_model:=vlp32c
 
 # Specify LiDAR IP address
 ros2 launch autosdv_sensor_kit_launch lidar.launch.xml host_ip:=192.168.26.1
