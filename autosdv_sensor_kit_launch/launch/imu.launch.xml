@@ -5,6 +5,10 @@
 
   <arg name="navsatfix_topic_name" default="mti/fix"/>
   <arg name="orientation_topic_name" default="/autoware_orientation"/>
+  <!-- gyro_bias_estimator only reports a gyro bias diagnostic (imu_corrector
+       applies the static bias from its param file). Off for a stack whose
+       diagnostic graph does not read it. -->
+  <arg name="launch_gyro_bias_estimator" default="true" description="gyro bias diagnostic"/>
 
   <!-- ZED IMU Source: Launch minimal ZED camera OUTSIDE the imu namespace -->
   <!-- Only launch if camera_model is NOT zedxm (i.e., camera.launch.xml is not launching ZED) -->
@@ -59,7 +63,7 @@
     </include>
 
     <!-- Gyro Bias Estimator - reads from appropriate source based on imu_raw_topic -->
-    <include file="$(find-pkg-share autoware_imu_corrector)/launch/gyro_bias_estimator.launch.xml">
+    <include file="$(find-pkg-share autoware_imu_corrector)/launch/gyro_bias_estimator.launch.xml" if="$(var launch_gyro_bias_estimator)">
       <arg name="input_imu_raw" value="$(var imu_raw_topic)"/>
       <arg name="input_odom" value="/localization/kinematic_state"/>
       <arg name="imu_corrector_param_file" value="$(var imu_corrector_param_file)"/>

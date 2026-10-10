@@ -16,6 +16,9 @@
   <arg name="use_gnss" default="" description="Enable GNSS: true, false (empty = use suite default)"/>
   <arg name="use_ntrip" default="false" description="Enable NTRIP client for RTK corrections (ublox only)"/>
   <arg name="enable_zed_object_detection" default="" description="Enable ZED object detection: true, false (empty = use suite default)"/>
+  <!-- Off for a stack that has no gyro_odometer to feed (the coach-pursuit
+       lab's dead reckoning reads velocity_status directly). -->
+  <arg name="launch_vehicle_velocity_converter" default="true" description="velocity_status -> twist_with_covariance for gyro_odometer"/>
 
   <!-- Sensor Suite Defaults -->
   <!-- Suite: robin_zed - Robin-W LiDAR + ZED X Mini + ZED IMU (integrated) -->
@@ -125,7 +128,7 @@
     </include>
 
     <!-- Vehicle Velocity Converter  -->
-    <include file="$(find-pkg-share autoware_vehicle_velocity_converter)/launch/vehicle_velocity_converter.launch.xml">
+    <include file="$(find-pkg-share autoware_vehicle_velocity_converter)/launch/vehicle_velocity_converter.launch.xml" if="$(var launch_vehicle_velocity_converter)">
       <arg name="input_vehicle_velocity_topic" value="/vehicle/status/velocity_status"/>
       <arg name="output_twist_with_covariance" value="/sensing/vehicle_velocity_converter/twist_with_covariance"/>
     </include>

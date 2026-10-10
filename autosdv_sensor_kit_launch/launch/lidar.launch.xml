@@ -10,6 +10,10 @@
   <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
   <arg name="vehicle_mirror_param_file" default="$(find-pkg-share autosdv_vehicle_description)/config/mirror.param.yaml"/>
   <arg name="pointcloud_container_name" default="pointcloud_container"/>
+  <!-- The preprocessing chain ending in concatenated/pointcloud. Off for a
+       stack that reads the driver's cloud directly and runs no Autoware
+       perception or localization (the coach-pursuit lab's board detector). -->
+  <arg name="launch_pointcloud_preprocessor" default="true" description="crop/deskew/passthrough to /sensing/lidar/concatenated/pointcloud"/>
   <arg name="robin_w_device_ip" default="172.168.1.10"/>
   <arg name="vlp32c_device_ip" default="192.168.7.10"/>
 
@@ -80,7 +84,7 @@
       </include>
     </group>
 
-    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/pointcloud_preprocessor.launch.py">
+    <include file="$(find-pkg-share autosdv_sensor_kit_launch)/launch/pointcloud_preprocessor.launch.py" if="$(var launch_pointcloud_preprocessor)">
       <arg name="base_frame" value="base_link"/>
       <arg name="use_intra_process" value="true"/>
       <arg name="use_multithread" value="true"/>
