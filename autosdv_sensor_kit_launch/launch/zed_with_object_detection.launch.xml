@@ -28,6 +28,8 @@
   <let name="zed_camera_config" value="$(find-pkg-share zed_wrapper)/config/$(var camera_model).yaml"/>
   <let name="zed_od_config" value="$(find-pkg-share zed_wrapper)/config/object_detection.yaml"/>
   <let name="zed_custom_od_config" value="$(find-pkg-share zed_wrapper)/config/custom_object_detection.yaml"/>
+  <!-- IMU publisher reliable: imu_corrector subscribes reliable, the wrapper defaults to best-effort -->
+  <let name="zed_imu_qos_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_imu_qos.yaml"/>
   <let name="autosdv_zed_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_object_detection.yaml"/>
 
   <!--
@@ -66,6 +68,7 @@
         <param from="$(var zed_camera_config)"/>
         <param from="$(var zed_od_config)"/>
         <param from="$(var zed_custom_od_config)"/>
+        <param from="$(var zed_imu_qos_config)"/>
         <param name="general.camera_name" value="$(var camera_name)"/>
         <param name="general.camera_model" value="$(var camera_model)"/>
         <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>
@@ -85,6 +88,7 @@
         <param from="$(var zed_od_config)"/>
         <param from="$(var zed_custom_od_config)"/>
         <param from="$(var autosdv_zed_config)"/>
+        <param from="$(var zed_imu_qos_config)"/>
         <param name="general.camera_name" value="$(var camera_name)"/>
         <param name="general.camera_model" value="$(var camera_model)"/>
         <param name="pos_tracking.publish_tf" value="$(var publish_tf)"/>

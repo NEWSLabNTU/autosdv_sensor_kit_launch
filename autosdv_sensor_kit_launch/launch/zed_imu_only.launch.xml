@@ -18,6 +18,8 @@
   <let name="zed_common_config" value="$(find-pkg-share zed_wrapper)/config/common_stereo.yaml"/>
   <let name="zed_camera_config" value="$(find-pkg-share zed_wrapper)/config/$(var camera_model).yaml"/>
   <let name="zed_imu_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_imu_minimal.yaml"/>
+  <!-- IMU publisher reliable: imu_corrector subscribes reliable, the wrapper defaults to best-effort -->
+  <let name="zed_imu_qos_config" value="$(find-pkg-share autosdv_sensor_kit_launch)/config/zed_imu_qos.yaml"/>
 
   <!-- Create ZED container with ABSOLUTE namespace -->
   <node_container pkg="rclcpp_components" exec="component_container_isolated"
@@ -32,6 +34,7 @@
       <param from="$(var zed_common_config)"/>
       <param from="$(var zed_camera_config)"/>
       <param from="$(var zed_imu_config)"/>
+      <param from="$(var zed_imu_qos_config)"/>
       <param name="general.camera_name" value="$(var camera_name)"/>
       <param name="general.camera_model" value="$(var camera_model)"/>
       <!-- Disable TF publishing - minimal mode -->

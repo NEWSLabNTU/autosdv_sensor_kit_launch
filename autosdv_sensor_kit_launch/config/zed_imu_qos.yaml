@@ -1,0 +1,14 @@
+/**:
+  ros__parameters:
+    # The wrapper publishes every topic BEST_EFFORT; the stock imu_corrector
+    # subscribes RELIABLE, and a best-effort publisher never matches a reliable
+    # subscriber. With imu_source:=zed the topic ran at 100 Hz while
+    # /sensing/imu/imu_data stayed empty and gyro_odometer produced no twist.
+    # The wrapper creates its publishers with
+    # QosOverridingOptions::with_default_policies(), so it declares per-topic
+    # override parameters; the key is the fully resolved topic name, which both
+    # ZED launch files give the node (/sensing/camera/zedxm/zedxm -> .../imu/data).
+    qos_overrides:
+      /sensing/camera/zedxm/imu/data:
+        publisher:
+          reliability: reliable
