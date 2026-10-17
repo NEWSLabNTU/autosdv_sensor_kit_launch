@@ -40,9 +40,15 @@
       <!-- Disable TF publishing - minimal mode -->
       <param name="pos_tracking.publish_tf" value="false"/>
       <param name="pos_tracking.publish_map_tf" value="false"/>
-      <!-- Enable IMU TF for imu_corrector -->
+      <!-- Enable IMU TF for imu_corrector. Without intra-process comms the
+           driver broadcasts it ONCE on /tf_static (the factory extrinsics);
+           with them it cannot use a transient-local publisher and re-sends it
+           on /tf at sensors_pub_rate (100 Hz), which starves Autoware's
+           depth-1 map -> base_link topic_state_monitor (car B, 2026-10-16:
+           ~1 Hz measured, engage refused). Nothing in this container takes
+           the IMU intra-process: imu_corrector runs in its own process. -->
       <param name="sensors.publish_imu_tf" value="true"/>
-      <extra_arg name="use_intra_process_comms" value="true"/>
+      <extra_arg name="use_intra_process_comms" value="false"/>
     </composable_node>
   </load_composable_node>
 
