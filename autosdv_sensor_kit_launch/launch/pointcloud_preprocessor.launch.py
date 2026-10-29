@@ -174,12 +174,13 @@ def make_passthrough_node(input_topic):
             ("input", input_topic),
             ("output", "concatenated/pointcloud"),
         ],
+        # output_frame is the only setting: PassThroughFilterComponent copies the
+        # cloud unchanged and declares nothing of its own, so a range or NaN
+        # setting here would be dropped without a word (play_launch reports it
+        # as param_ignored).
         parameters=[
             {
                 "output_frame": LaunchConfiguration("base_frame"),
-                "remove_nan": True,  # Remove NaN points
-                "float_min": -999.0,  # Don't filter by range
-                "float_max": 999.0,  # Don't filter by range
             }
         ],
         extra_arguments=[
