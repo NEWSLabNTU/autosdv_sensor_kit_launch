@@ -9,6 +9,7 @@
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <build_depend>autosdv_cmake</build_depend>
 
   <exec_depend>autoware_gnss_poser</exec_depend>
   <exec_depend>autoware_pointcloud_preprocessor</exec_depend>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- The Velodyne driver, Autoware 2.1.0: Nebula's velodyne_launch_all_hw.xml from
+     nebula_velodyne. lidar.launch.xml includes this file; the same file under each
+     autoware/<version>/ names that version's Nebula package (1.5.0 nebula_ros,
+     2.1.0 nebula_velodyne, Nebula 1.2). -->
+<launch>
+  <arg name="sensor_model"/>
+  <arg name="launch_hw"/>
+  <arg name="config_file"/>
+  <include file="$(find-pkg-share nebula_velodyne)/launch/velodyne_launch_all_hw.xml">
+    <arg name="sensor_model" value="$(var sensor_model)"/>
+    <arg name="launch_hw" value="$(var launch_hw)"/>
+    <arg name="config_file" value="$(var config_file)"/>
+  </include>
+</launch>
