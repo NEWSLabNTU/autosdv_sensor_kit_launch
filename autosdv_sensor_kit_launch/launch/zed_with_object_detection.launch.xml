@@ -44,8 +44,17 @@
   -->
 
   <!-- Create ZED container with ABSOLUTE namespace -->
+  <!-- launch-prefix: the ZED's capture library (Argus) builds its buffers
+       through EGL and fails at "CAMERA OPENING" with "(Argus) Error
+       BadParameter" when the process has a DISPLAY (a VNC display has no NVIDIA
+       driver behind it) or VirtualGL's faker in LD_PRELOAD; every terminal of
+       the TurboVNC desktop has both. Either one alone breaks it (car B,
+       2026-11-17), so the container drops both, whichever terminal launched
+       the stack; the rest of the launch, RViz included, keeps them. Honoured
+       by ros2 launch and by play_launch 0.41.4 (issue #0085; 0.18 dropped it). -->
   <node_container pkg="rclcpp_components" exec="component_container_isolated"
-                  name="zed_container" namespace="/sensing/camera/$(var camera_name)">
+                  name="zed_container" namespace="/sensing/camera/$(var camera_name)"
+                  launch-prefix="env -u DISPLAY -u LD_PRELOAD">
     <param name="use_multi_threaded_executor" value="true"/>
   </node_container>
 
